@@ -1,0 +1,38 @@
+{
+  "name": "web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "solid-start dev",
+    "build": "solid-start build",
+    "start": "solid-start start",
+    "lint": "eslint 'src/**'"
+  },
+  "dependencies": {
+    "@solidjs/meta": "^0.28.2",
+    "@solidjs/router": "^0.5.1",
+    "@trpc/client": "10.4.3",
+    "@trpc/server": "10.4.3",
+    "api": "workspace:*",
+    "solid-js": "^1.6.4",
+    "solid-start": "^0.2.7",
+    "solid-start-node": "^0.2.7",
+    "ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.5",
+    "@iconify/json": "^2.1.150",
+    "@kidonng/daisyui": "^2.31.0",
+    "@types/node": "^18.11.12",
+    "@types/web": "^0.0.84",
+    "@unocss/reset": "^0.47.5",
+    "eslint": "8.29.0",
+    "eslint-config-custom": "workspace:*",
+    "tsconfig": "workspace:*",
+    "typescript": "^4.9.4",
+    "unocss": "^0.47.5",
+    "unocss-preset-daisy": "^1.2.0",
+    "vite": "^4.0.0"
+  }
+}

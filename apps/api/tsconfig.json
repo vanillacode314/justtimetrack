@@ -1,0 +1,10 @@
+{
+  "extends": "tsconfig/solid-start.json",
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "paths": {
+      "@api/*": ["./src/*"]
+    }
+  }
+}
