@@ -10,6 +10,7 @@ import {
 } from "unocss";
 import packageJson from "./package.json" assert { type: "json" };
 import presetDaisy from "unocss-preset-daisy";
+import vercel from "solid-start-vercel";
 
 export default defineConfig({
   define: {
@@ -23,7 +24,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    solid({ ssr: false }),
+    solid({ ssr: false, adapter: vercel() }),
     Unocss({
       transformers: [transformerDirectives()],
       presets: [
