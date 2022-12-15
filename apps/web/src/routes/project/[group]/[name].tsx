@@ -67,9 +67,12 @@ export const ProjectPage: Component = () => {
     );
   };
 
+  let interval: number | undefined;
   const toggle = () => {
     if (running()) {
       batch(() => {
+        clearInterval(interval);
+        interval = undefined;
         setUserState(
           "projectGroups",
           groupIndex,
@@ -108,6 +111,19 @@ export const ProjectPage: Component = () => {
         }
       );
     }
+
+    interval = setInterval(() => {
+      setUserState(
+        "projectGroups",
+        groupIndex,
+        "projects",
+        projectIndex,
+        "logs",
+        runningIndex(),
+        "endedAt",
+        Date.now()
+      );
+    }, 1000);
   };
 
   return (
@@ -247,16 +263,12 @@ export const ProjectPage: Component = () => {
                       timeStyle: "medium",
                     })}
                   </span>
-                  {log.done && (
-                    <>
-                      <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                        Duration:
-                      </span>
-                      <span>
-                        {formatTime((log.endedAt - log.startedAt) / 1000)}
-                      </span>
-                    </>
-                  )}
+                  <span class="uppercase text-xs font-semibold tracking-wider text-right">
+                    Duration:
+                  </span>
+                  <span>
+                    {formatTime((log.endedAt - log.startedAt) / 1000)}
+                  </span>
                   <span class="uppercase text-xs font-semibold tracking-wider text-right">
                     Comment:
                   </span>
