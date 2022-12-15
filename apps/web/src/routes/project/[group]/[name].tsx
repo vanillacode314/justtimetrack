@@ -1,4 +1,5 @@
-import { batch, Show, For, createSignal, Component } from "solid-js";
+import { Show, For, createSignal, Component } from "solid-js";
+import { produce } from "solid-js/store";
 import { useNavigate, useParams } from "solid-start";
 import { useUserState } from "~/stores";
 import { IActivityLog, IProject } from "~/types";
@@ -13,9 +14,7 @@ export const ProjectPage: Component = () => {
   const [error, setError] = createSignal<string>("");
 
   const groupIndex = userState.projectGroups.findIndex(
-    (group) =>
-      group.id === params.group ||
-      group.name.toLowerCase().replaceAll(" ", "-") === params.group
+    (group) => group.id === params.group
   );
   const group = userState.projectGroups[groupIndex];
   if (groupIndex === -1) setError(`group with id ${params.group} not found`);
@@ -25,9 +24,7 @@ export const ProjectPage: Component = () => {
 
   if (group) {
     projectIndex = group.projects.findIndex(
-      (project) =>
-        project.id === params.name ||
-        project.name.toLowerCase().replaceAll(" ", "-") === params.name
+      (project) => project.id === params.name
     );
     if (projectIndex === -1)
       setError(
@@ -39,65 +36,50 @@ export const ProjectPage: Component = () => {
   const runningIndex = () => project.logs.findIndex((log) => !log.done);
   const running = () => runningIndex() !== -1;
 
-  const totalLoggedTime = () => {
-    return (
-      project.logs.reduce(
-        (sum, log) => sum + (log.endedAt - log.startedAt),
-        0
-      ) / 1000
-    );
-  };
+  const totalLoggedTime = () =>
+    project.logs.reduce((sum, log) => sum + (log.endedAt - log.startedAt), 0) /
+    1000;
 
   const formatTime = (inputSeconds: number) => {
     const { hours, minutes, seconds } = formatSeconds(inputSeconds);
     return `${hours}h ${minutes}m ${seconds}s`;
   };
 
-  const removeLog = (id: IActivityLog["id"]) => {
+  const removeLog = (id: IActivityLog["id"]) =>
     setUserState(
       "projectGroups",
       groupIndex,
       "projects",
       projectIndex,
       "logs",
-      project.logs.filter((log) => log.id !== id)
+      (logs) => logs.filter((log) => log.id !== id)
     );
-  };
 
   const removeProject = () => {
     navigate("/");
     setUserState("projectGroups", groupIndex, "projects", (projects) =>
-      projects.filter((project) => project.name !== params.name)
+      projects.filter((project) => project.id !== params.name)
     );
   };
 
   let interval: number | undefined;
   const toggle = () => {
     if (running()) {
-      batch(() => {
-        clearInterval(interval);
-        interval = undefined;
-        setUserState(
-          "projectGroups",
-          groupIndex,
-          "projects",
-          projectIndex,
-          "logs",
-          runningIndex(),
-          "endedAt",
-          Date.now()
-        );
-        setUserState(
-          "projectGroups",
-          groupIndex,
-          "projects",
-          projectIndex,
-          "logs",
-          runningIndex(),
-          "done",
-          true
-        );
-      });
+      clearInterval(interval);
+      interval = undefined;
+
+      setUserState(
+        "projectGroups",
+        groupIndex,
+        "projects",
+        projectIndex,
+        "logs",
+        runningIndex(),
+        produce((log) => {
+          log.endedAt = Date.now();
+          log.done = true;
+        })
+      );
     } else {
       setUserState(
         "projectGroups",
@@ -117,6 +99,7 @@ export const ProjectPage: Component = () => {
     }
 
     interval = setInterval(() => {
+      if (!running()) return;
       setUserState(
         "projectGroups",
         groupIndex,

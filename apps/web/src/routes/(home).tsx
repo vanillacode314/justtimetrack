@@ -23,11 +23,7 @@ export default function Home() {
               <For each={projects}>
                 {({ id: projectId, name: projectName, description }) => (
                   <A
-                    href={`/project/${groupName
-                      .toLowerCase()
-                      .replaceAll(" ", "-")}/${projectName
-                      .toLowerCase()
-                      .replaceAll(" ", "-")}`}
+                    href={`/project/${groupId}/${projectId}`}
                     class="px-5 py-3 gap-1 rounded bg-base-100 flex flex-col hover:bg-green-900 transition-colors"
                   >
                     <h2 class="font-bold uppercase flex gap-1 items-baseline justify-between">

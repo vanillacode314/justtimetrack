@@ -90,7 +90,7 @@ export const AddNewProjectModal: Component = () => {
                 userState.projectGroups[groupIndex].projects.length,
                 (formData.paid
                   ? {
-                      id: crypto.randomUUID(),
+                      id: formData.name.toLowerCase().replaceAll(" ", "-"),
                       name: formData.name,
                       description: "",
                       paid: true,
@@ -99,7 +99,7 @@ export const AddNewProjectModal: Component = () => {
                       currency: formData.currency,
                     }
                   : {
-                      id: crypto.randomUUID(),
+                      id: formData.name.toLowerCase().replaceAll(" ", "-"),
                       name: formData.name,
                       description: "",
                       logs: [],
@@ -158,7 +158,7 @@ export const AddNewProjectModal: Component = () => {
                   setUserState("projectGroups", (_) => [
                     ..._,
                     {
-                      id: crypto.randomUUID(),
+                      id: groupName.toLowerCase().replaceAll(" ", "-"),
                       name: groupName,
                       projects: [],
                     },
