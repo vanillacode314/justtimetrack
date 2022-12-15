@@ -36,7 +36,12 @@ export default defineConfig({
             "vertical-align": "middle",
           },
         }),
-        presetWebFonts({}),
+        presetWebFonts({
+          extendTheme: true,
+          fonts: {
+            sans: ["Barlow:400,500,600,700"],
+          },
+        }),
       ],
     }),
   ],

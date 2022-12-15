@@ -1,5 +1,7 @@
 import { Component, JSXElement } from "solid-js";
 import { Drawer } from "~/components/Drawer";
+import { Navbar } from "~/components/Navbar";
+import Toast from "~/components/Toast";
 
 interface Props {
   children: JSXElement;
@@ -8,8 +10,9 @@ interface Props {
 export const BaseLayout: Component<Props> = (props) => {
   return (
     <>
-      <Drawer />
-      <main style={{ padding: "1rem" }}>{props.children}</main>
+      <Navbar />
+      <Drawer>{props.children}</Drawer>
+      <Toast />
     </>
   );
 };

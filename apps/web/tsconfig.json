@@ -1,6 +1,6 @@
 {
   "extends": "tsconfig/solid-start.json",
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "src/global.d.ts"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "types": ["vite/client"],
