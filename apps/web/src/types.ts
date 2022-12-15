@@ -1,12 +1,14 @@
 type Timestamp = number;
 
 export interface IProjectGroup {
+  id: string;
   name: string;
   projects: IProject[];
 }
 
 export type IProject =
   | {
+      id: string;
       name: string;
       description: string;
       logs: IActivityLog[];

@@ -4,7 +4,7 @@ import { Accordion } from "~/components/Accordion";
 import { useUserState } from "~/stores";
 
 export default function Home() {
-  const [userState, setUserState] = useUserState();
+  const [userState, _setUserState] = useUserState();
 
   return (
     <main class="p-5">
@@ -14,16 +14,20 @@ export default function Home() {
           data: group,
         }))}
       >
-        {({ name: groupName, projects }) => (
+        {({ id: groupId, name: groupName, projects }) => (
           <Show
             when={projects.length > 0}
             fallback={<div class="p-5">No projects in this group yet.</div>}
           >
             <div class="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-3 p-5">
               <For each={projects}>
-                {({ name: projectName, description }) => (
+                {({ id: projectId, name: projectName, description }) => (
                   <A
-                    href={`/project/${groupName}/${projectName}`}
+                    href={`/project/${groupName
+                      .toLowerCase()
+                      .replaceAll(" ", "-")}/${projectName
+                      .toLowerCase()
+                      .replaceAll(" ", "-")}`}
                     class="px-5 py-3 gap-1 rounded bg-base-100 flex flex-col hover:bg-green-900 transition-colors"
                   >
                     <h2 class="font-bold uppercase flex gap-1 items-baseline justify-between">

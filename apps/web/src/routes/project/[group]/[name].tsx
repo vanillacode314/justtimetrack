@@ -13,21 +13,25 @@ export const ProjectPage: Component = () => {
   const [error, setError] = createSignal<string>("");
 
   const groupIndex = userState.projectGroups.findIndex(
-    (group) => group.name === params.group
+    (group) =>
+      group.id === params.group ||
+      group.name.toLowerCase().replaceAll(" ", "-") === params.group
   );
   const group = userState.projectGroups[groupIndex];
-  if (groupIndex === -1) setError(`group with name ${params.group} not found`);
+  if (groupIndex === -1) setError(`group with id ${params.group} not found`);
 
   let project!: IProject;
   let projectIndex: number;
 
   if (group) {
     projectIndex = group.projects.findIndex(
-      (project) => project.name === params.name
+      (project) =>
+        project.id === params.name ||
+        project.name.toLowerCase().replaceAll(" ", "-") === params.name
     );
     if (projectIndex === -1)
       setError(
-        `project with name ${params.name} not found in group ${params.group}`
+        `project with id ${params.name} not found in group ${group.name}`
       );
     else project = group.projects[projectIndex];
   }

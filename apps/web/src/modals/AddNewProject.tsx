@@ -90,6 +90,7 @@ export const AddNewProjectModal: Component = () => {
                 userState.projectGroups[groupIndex].projects.length,
                 (formData.paid
                   ? {
+                      id: crypto.randomUUID(),
                       name: formData.name,
                       description: "",
                       paid: true,
@@ -98,6 +99,7 @@ export const AddNewProjectModal: Component = () => {
                       currency: formData.currency,
                     }
                   : {
+                      id: crypto.randomUUID(),
                       name: formData.name,
                       description: "",
                       logs: [],
@@ -131,12 +133,32 @@ export const AddNewProjectModal: Component = () => {
                 onClick={() => {
                   const groupName = prompt("Enter group name");
                   if (groupName === null) {
-                    alert("Invalid group name");
+                    toast(
+                      "Invalid group name",
+                      "Group name must be alphanumeric",
+                      {
+                        type: "error",
+                      }
+                    );
                     return;
+                  }
+                  if (
+                    userState.projectGroups.some(
+                      (group) => group.name === groupName
+                    )
+                  ) {
+                    toast(
+                      "Group Already Exists",
+                      `Group with name ${groupName} already exists`,
+                      {
+                        type: "error",
+                      }
+                    );
                   }
                   setUserState("projectGroups", (_) => [
                     ..._,
                     {
+                      id: crypto.randomUUID(),
                       name: groupName,
                       projects: [],
                     },
