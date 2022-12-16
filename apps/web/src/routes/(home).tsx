@@ -1,10 +1,10 @@
-import { For, Show } from "solid-js";
-import { A } from "solid-start";
-import { Accordion } from "~/components/Accordion";
-import { useUserState } from "~/stores";
+import { For, Show } from 'solid-js'
+import { A } from 'solid-start'
+import { Accordion } from '~/components/Accordion'
+import { useUserState } from '~/stores'
 
 export default function Home() {
-  const [userState, _setUserState] = useUserState();
+  const [userState, _setUserState] = useUserState()
 
   return (
     <main class="p-5">
@@ -38,5 +38,5 @@ export default function Home() {
         )}
       </Accordion>
     </main>
-  );
+  )
 }

@@ -1,5 +1,5 @@
 // @refresh reload
-import { Component, Suspense } from "solid-js";
+import { Component, Suspense } from 'solid-js'
 import {
   Body,
   ErrorBoundary,
@@ -11,13 +11,13 @@ import {
   Routes,
   Scripts,
   Title,
-} from "solid-start";
+} from 'solid-start'
 
-import "@unocss/reset/tailwind.css";
-import "@kidonng/daisyui/index.css";
-import "virtual:uno.css";
-import Base from "~/layouts/Base";
-import { AddNewProjectModal } from "./modals/AddNewProjectModal";
+import '@unocss/reset/tailwind.css'
+import '@kidonng/daisyui/index.css'
+import 'virtual:uno.css'
+import Base from '~/layouts/Base'
+import { AddNewProjectModal } from './modals/AddNewProjectModal'
 
 export const Root: Component = () => {
   return (
@@ -46,7 +46,7 @@ export const Root: Component = () => {
         </Base>
       </Body>
     </Html>
-  );
-};
+  )
+}
 
-export default Root;
+export default Root

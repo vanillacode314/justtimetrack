@@ -1,56 +1,56 @@
-import { For, Component, JSXElement } from "solid-js";
-import { A } from "solid-start";
-import { useAppState } from "~/stores";
+import { For, Component, JSXElement } from 'solid-js'
+import { A } from 'solid-start'
+import { useAppState } from '~/stores'
 
 interface Props {
-  children: JSXElement;
+  children: JSXElement
 }
 
 type ILink = {
-  label: string;
-  icon?: string;
-  url: string;
-  modal?: string;
+  label: string
+  icon?: string
+  url: string
+  modal?: string
   sublinks?: Array<
-    Omit<ILink, "modal" | "url" | "sublinks"> &
+    Omit<ILink, 'modal' | 'url' | 'sublinks'> &
       Xor<
         {
-          modal: string;
+          modal: string
         },
         Xor<
           {
-            action: () => void;
+            action: () => void
           },
           {
-            url: string;
+            url: string
           }
         >
       >
-  >;
-};
+  >
+}
 
 const navLinks: ILink[] = [
   {
-    label: "Projects",
-    icon: "i-mdi-user",
-    url: "/",
+    label: 'Projects',
+    icon: 'i-mdi-user',
+    url: '/',
     sublinks: [
       {
-        label: "Add New",
-        icon: "i-mdi-plus",
-        modal: "add-new-project-modal",
+        label: 'Add New',
+        icon: 'i-mdi-plus',
+        modal: 'add-new-project-modal',
       },
     ],
   },
   {
-    label: "Settings",
-    icon: "i-mdi-cog",
-    url: "/settings",
+    label: 'Settings',
+    icon: 'i-mdi-cog',
+    url: '/settings',
   },
-];
+]
 
 export const Drawer: Component<Props> = (props) => {
-  const [appState, setAppState] = useAppState();
+  const [appState, setAppState] = useAppState()
 
   return (
     <div class="drawer drawer-mobile">
@@ -59,7 +59,7 @@ export const Drawer: Component<Props> = (props) => {
         type="checkbox"
         class="drawer-toggle"
         checked={appState.drawerVisible}
-        onChange={(e) => setAppState("drawerVisible", e.currentTarget.checked)}
+        onChange={(e) => setAppState('drawerVisible', e.currentTarget.checked)}
       />
       <div class="drawer-content">{props.children}</div>
       <div class="drawer-side border-r-2 border-stone-900">
@@ -89,7 +89,7 @@ export const Drawer: Component<Props> = (props) => {
                       {modal ? (
                         <label
                           for={modal}
-                          onClick={() => setAppState("drawerVisible", false)}
+                          onClick={() => setAppState('drawerVisible', false)}
                         >
                           &nbsp;
                           {icon && <div class={icon}></div>}
@@ -117,7 +117,7 @@ export const Drawer: Component<Props> = (props) => {
         </ul>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Drawer;
+export default Drawer

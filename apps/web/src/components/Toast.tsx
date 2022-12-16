@@ -1,42 +1,42 @@
-import { For } from "solid-js";
-import { Component } from "solid-js";
-import { createStore } from "solid-js/store";
+import { For } from 'solid-js'
+import { Component } from 'solid-js'
+import { createStore } from 'solid-js/store'
 
-const uid = () => crypto.randomUUID();
+const uid = () => crypto.randomUUID()
 
-type MessageType = "info" | "success" | "warning" | "error";
+type MessageType = 'info' | 'success' | 'warning' | 'error'
 interface IMessage {
-  id: string;
-  title: string;
-  content: string;
-  icon?: string;
-  type: MessageType;
-  dismiss: () => void;
+  id: string
+  title: string
+  content: string
+  icon?: string
+  type: MessageType
+  dismiss: () => void
 }
 
-const [messages, setMessages] = createStore<IMessage[]>([]);
+const [messages, setMessages] = createStore<IMessage[]>([])
 
 const defaultIconMap = {
-  info: "i-carbon-information-filled",
-  warning: "i-carbon-warning-alt-filled",
-  error: "i-carbon-error-filled",
-  success: "i-carbon-checkmark-filled",
-} satisfies Record<MessageType, string>;
+  info: 'i-carbon-information-filled',
+  warning: 'i-carbon-warning-alt-filled',
+  error: 'i-carbon-error-filled',
+  success: 'i-carbon-checkmark-filled',
+} satisfies Record<MessageType, string>
 
 interface ToastOptions {
-  icon: string;
-  duration: number;
-  type: MessageType;
+  icon: string
+  duration: number
+  type: MessageType
 }
 export const toast = (
   title: string,
   content: string,
-  { type = "info", icon, duration = 5000 }: Partial<ToastOptions> = {}
+  { type = 'info', icon, duration = 5000 }: Partial<ToastOptions> = {}
 ) => {
-  const id = uid();
+  const id = uid()
 
   const dismiss = () =>
-    setMessages((messages) => messages.filter((msg) => msg.id !== id));
+    setMessages((messages) => messages.filter((msg) => msg.id !== id))
 
   setMessages(messages.length, {
     id,
@@ -45,10 +45,10 @@ export const toast = (
     icon: icon || defaultIconMap[type],
     type,
     dismiss,
-  });
+  })
 
-  setTimeout(dismiss, duration);
-};
+  setTimeout(dismiss, duration)
+}
 
 export const Toast: Component = () => {
   return () => (
@@ -67,7 +67,7 @@ export const Toast: Component = () => {
         )}
       </For>
     </div>
-  );
-};
+  )
+}
 
-export default Toast;
+export default Toast

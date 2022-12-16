@@ -1,24 +1,24 @@
-import { For, createSignal, Show, JSXElement } from "solid-js";
+import { For, createSignal, Show, JSXElement } from 'solid-js'
 
 interface IItem<T = any> {
-  title: string;
-  data: T;
+  title: string
+  data: T
 }
 
 interface Props<T> {
-  items: IItem<T>[];
-  children: (data: T) => JSXElement;
+  items: IItem<T>[]
+  children: (data: T) => JSXElement
 }
 
 export const Accordion: <T>(props: Props<T>) => JSXElement = (props) => {
-  const [activeIndex, setActiveIndex] = createSignal<number>(-1); // -1 indicates no item active
+  const [activeIndex, setActiveIndex] = createSignal<number>(-1) // -1 indicates no item active
 
   function activate(n: number) {
     if (activeIndex() === n) {
-      setActiveIndex(-1); // -1 indicates no item active
-      return;
+      setActiveIndex(-1) // -1 indicates no item active
+      return
     }
-    setActiveIndex(n);
+    setActiveIndex(n)
   }
 
   return (
@@ -33,8 +33,8 @@ export const Accordion: <T>(props: Props<T>) => JSXElement = (props) => {
               <span>{title}</span>
               <span
                 classList={{
-                  "i-carbon-add-alt": activeIndex() !== index(),
-                  "i-carbon-subtract-alt": activeIndex() === index(),
+                  'i-carbon-add-alt': activeIndex() !== index(),
+                  'i-carbon-subtract-alt': activeIndex() === index(),
                 }}
               ></span>
             </button>
@@ -47,7 +47,7 @@ export const Accordion: <T>(props: Props<T>) => JSXElement = (props) => {
         )}
       </For>
     </div>
-  );
-};
+  )
+}
 
-export default Accordion;
+export default Accordion

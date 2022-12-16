@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { Component } from 'solid-js'
 
 export const Navbar: Component = () => {
   return (
@@ -12,7 +12,7 @@ export const Navbar: Component = () => {
         <span class="font-semibold">JustTimeTrack</span>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar

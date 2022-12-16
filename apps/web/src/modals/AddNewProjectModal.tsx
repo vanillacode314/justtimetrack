@@ -1,15 +1,15 @@
-import { createSignal, Show, Component, For } from "solid-js";
-import { createStore } from "solid-js/store";
-import { useUserState } from "~/stores";
-import { z, ZodError } from "zod";
-import { fromZodError } from "zod-validation-error";
-import { IProject } from "~/types";
-import { toast } from "~/components/Toast";
+import { createSignal, Show, Component, For } from 'solid-js'
+import { createStore } from 'solid-js/store'
+import { useUserState } from '~/stores'
+import { z, ZodError } from 'zod'
+import { fromZodError } from 'zod-validation-error'
+import { IProject } from '~/types'
+import { toast } from '~/components/Toast'
 
 export const AddNewProjectModal: Component = () => {
-  const [userState, setUserState] = useUserState();
+  const [userState, setUserState] = useUserState()
 
-  const [open, setOpen] = createSignal<boolean>(false);
+  const [open, setOpen] = createSignal<boolean>(false)
 
   const formSchema = z.object({
     group: z.string().min(3),
@@ -17,17 +17,17 @@ export const AddNewProjectModal: Component = () => {
     paid: z.boolean(),
     hourlyRate: z.number().min(1),
     currency: z.string(),
-  });
+  })
   const getDefaultData = () => ({
-    group: "",
-    name: "",
+    group: '',
+    name: '',
     paid: false,
     hourlyRate: 1,
-    currency: "USD",
-  });
+    currency: 'USD',
+  })
   const [formData, setFormData] = createStore<z.infer<typeof formSchema>>(
     getDefaultData()
-  );
+  )
 
   return (
     <>
@@ -44,28 +44,28 @@ export const AddNewProjectModal: Component = () => {
           <form
             class="py-5 flex flex-col gap-3"
             onSubmit={(e) => {
-              e.preventDefault();
+              e.preventDefault()
               try {
-                formSchema.parse(formData);
+                formSchema.parse(formData)
               } catch (err) {
                 if (err instanceof ZodError) {
-                  const validationError = fromZodError(err);
+                  const validationError = fromZodError(err)
 
-                  let message = validationError.message;
-                  message = message.slice(message.indexOf(":") + 1);
-                  message = message.replaceAll(";", "\n").trim();
+                  let message = validationError.message
+                  message = message.slice(message.indexOf(':') + 1)
+                  message = message.replaceAll(';', '\n').trim()
 
-                  toast("Invalid Input", message, {
-                    type: "error",
-                  });
+                  toast('Invalid Input', message, {
+                    type: 'error',
+                  })
                 }
-                return;
+                return
               }
 
               const groupIndex = userState.projectGroups.findIndex(
                 (g) => g.name === formData.group
-              );
-              if (groupIndex === -1) throw new Error("group not found");
+              )
+              if (groupIndex === -1) throw new Error('group not found')
 
               // check if project with same name already exists in the group
 
@@ -75,52 +75,52 @@ export const AddNewProjectModal: Component = () => {
                 )
               ) {
                 toast(
-                  "Project Already Exists",
+                  'Project Already Exists',
                   `Project with name ${formData.name} already exists in the group ${formData.group}`,
                   {
-                    type: "error",
+                    type: 'error',
                   }
-                );
-                return;
+                )
+                return
               }
 
               setUserState(
-                "projectGroups",
+                'projectGroups',
                 groupIndex,
-                "projects",
+                'projects',
                 userState.projectGroups[groupIndex].projects.length,
                 (formData.paid
                   ? {
-                      id: formData.name.toLowerCase().replaceAll(" ", "-"),
+                      id: formData.name.toLowerCase().replaceAll(' ', '-'),
                       name: formData.name,
-                      description: "",
+                      description: '',
                       paid: true,
                       logs: [],
                       hourlyRate: formData.hourlyRate,
                       currency: formData.currency,
                     }
                   : {
-                      id: formData.name.toLowerCase().replaceAll(" ", "-"),
+                      id: formData.name.toLowerCase().replaceAll(' ', '-'),
                       name: formData.name,
-                      description: "",
+                      description: '',
                       logs: [],
                       paid: false,
                     }) as IProject
-              );
+              )
               toast(
-                "Successfully added new project",
+                'Successfully added new project',
                 `Project ${formData.name} added under group ${formData.group}`,
                 {
-                  type: "success",
+                  type: 'success',
                 }
-              );
-              setFormData(getDefaultData());
-              setOpen(false);
+              )
+              setFormData(getDefaultData())
+              setOpen(false)
             }}
           >
             <select
               value={formData.group}
-              onChange={(e) => setFormData("group", e.currentTarget.value)}
+              onChange={(e) => setFormData('group', e.currentTarget.value)}
               class="select select-bordered w-full"
             >
               <option value="" disabled>
@@ -132,16 +132,16 @@ export const AddNewProjectModal: Component = () => {
               <option
                 value="new"
                 onClick={() => {
-                  const groupName = prompt("Enter group name");
+                  const groupName = prompt('Enter group name')
                   if (groupName === null) {
                     toast(
-                      "Invalid group name",
-                      "Group name must be alphanumeric",
+                      'Invalid group name',
+                      'Group name must be alphanumeric',
                       {
-                        type: "error",
+                        type: 'error',
                       }
-                    );
-                    return;
+                    )
+                    return
                   }
                   if (
                     userState.projectGroups.some(
@@ -149,22 +149,22 @@ export const AddNewProjectModal: Component = () => {
                     )
                   ) {
                     toast(
-                      "Group Already Exists",
+                      'Group Already Exists',
                       `Group with name ${groupName} already exists`,
                       {
-                        type: "error",
+                        type: 'error',
                       }
-                    );
+                    )
                   }
-                  setUserState("projectGroups", (_) => [
+                  setUserState('projectGroups', (_) => [
                     ..._,
                     {
-                      id: groupName.toLowerCase().replaceAll(" ", "-"),
+                      id: groupName.toLowerCase().replaceAll(' ', '-'),
                       name: groupName,
                       projects: [],
                     },
-                  ]);
-                  setFormData("group", groupName);
+                  ])
+                  setFormData('group', groupName)
                 }}
               >
                 New Group
@@ -175,7 +175,7 @@ export const AddNewProjectModal: Component = () => {
               placeholder="Project Name"
               class="input input-bordered w-full"
               value={formData.name}
-              onInput={(e) => setFormData("name", e.currentTarget.value)}
+              onInput={(e) => setFormData('name', e.currentTarget.value)}
             />
             <label class="label cursor-pointer">
               <span class="label-text">Paid</span>
@@ -183,7 +183,7 @@ export const AddNewProjectModal: Component = () => {
                 type="checkbox"
                 class="toggle"
                 checked={formData.paid}
-                onChange={(e) => setFormData("paid", e.currentTarget.checked)}
+                onChange={(e) => setFormData('paid', e.currentTarget.checked)}
               />
             </label>
             <Show when={formData.paid}>
@@ -194,7 +194,7 @@ export const AddNewProjectModal: Component = () => {
                   class="input input-bordered w-full"
                   value={formData.hourlyRate}
                   onInput={(e) =>
-                    setFormData("hourlyRate", +e.currentTarget.value)
+                    setFormData('hourlyRate', +e.currentTarget.value)
                   }
                 />
                 <input
@@ -203,7 +203,7 @@ export const AddNewProjectModal: Component = () => {
                   class="input input-bordered w-full"
                   value={formData.currency}
                   onInput={(e) =>
-                    setFormData("currency", e.currentTarget.value)
+                    setFormData('currency', e.currentTarget.value)
                   }
                 />
               </>
@@ -217,7 +217,7 @@ export const AddNewProjectModal: Component = () => {
         </label>
       </label>
     </>
-  );
-};
+  )
+}
 
-export default AddNewProjectModal;
+export default AddNewProjectModal

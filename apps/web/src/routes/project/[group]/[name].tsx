@@ -1,125 +1,125 @@
-import { Show, For, createSignal, Component } from "solid-js";
-import { produce } from "solid-js/store";
-import { useNavigate, useParams } from "solid-start";
-import { CommentLogModal } from "~/modals/CommentLogModal";
-import { useUserState } from "~/stores";
-import { IActivityLog, IProject } from "~/types";
-import { formatSeconds, round } from "~/utils";
+import { Show, For, createSignal, Component } from 'solid-js'
+import { produce } from 'solid-js/store'
+import { useNavigate, useParams } from 'solid-start'
+import { CommentLogModal } from '~/modals/CommentLogModal'
+import { useUserState } from '~/stores'
+import { IActivityLog, IProject } from '~/types'
+import { formatSeconds, round } from '~/utils'
 
 export const ProjectPage: Component = () => {
-  const [userState, setUserState] = useUserState();
+  const [userState, setUserState] = useUserState()
 
-  const params = useParams();
-  const navigate = useNavigate();
+  const params = useParams()
+  const navigate = useNavigate()
 
-  const [selectedLog, setSelectedLog] = createSignal<IActivityLog>();
+  const [selectedLog, setSelectedLog] = createSignal<IActivityLog>()
 
-  const [error, setError] = createSignal<string>("");
+  const [error, setError] = createSignal<string>('')
 
   // find group
   const groupIndex = userState.projectGroups.findIndex(
     (group) => group.id === params.group
-  );
-  const group = userState.projectGroups[groupIndex];
-  if (groupIndex === -1) setError(`group with id ${params.group} not found`);
+  )
+  const group = userState.projectGroups[groupIndex]
+  if (groupIndex === -1) setError(`group with id ${params.group} not found`)
 
   // find project
-  let project!: IProject;
-  let projectIndex: number;
+  let project!: IProject
+  let projectIndex: number
 
   if (group) {
     projectIndex = group.projects.findIndex(
       (project) => project.id === params.name
-    );
+    )
     if (projectIndex === -1)
       setError(
         `project with id ${params.name} not found in group ${group.name}`
-      );
-    else project = group.projects[projectIndex];
+      )
+    else project = group.projects[projectIndex]
   }
 
   // check if a log is ongoing
-  const runningIndex = () => project.logs.findIndex((log) => !log.done);
-  const running = () => runningIndex() !== -1;
+  const runningIndex = () => project.logs.findIndex((log) => !log.done)
+  const running = () => runningIndex() !== -1
 
   // utils
   const totalLoggedTime = () =>
     project.logs.reduce((sum, log) => sum + (log.endedAt - log.startedAt), 0) /
-    1000;
+    1000
 
   const formatTime = (inputSeconds: number) => {
-    const { hours, minutes, seconds } = formatSeconds(inputSeconds);
-    return `${hours}h ${minutes}m ${seconds}s`;
-  };
+    const { hours, minutes, seconds } = formatSeconds(inputSeconds)
+    return `${hours}h ${minutes}m ${seconds}s`
+  }
 
-  const removeLog = (id: IActivityLog["id"]) =>
+  const removeLog = (id: IActivityLog['id']) =>
     setUserState(
-      "projectGroups",
+      'projectGroups',
       groupIndex,
-      "projects",
+      'projects',
       projectIndex,
-      "logs",
+      'logs',
       (logs) => logs.filter((log) => log.id !== id)
-    );
+    )
 
   const removeProject = () => {
-    navigate("/");
-    setUserState("projectGroups", groupIndex, "projects", (projects) =>
+    navigate('/')
+    setUserState('projectGroups', groupIndex, 'projects', (projects) =>
       projects.filter((project) => project.id !== params.name)
-    );
-  };
+    )
+  }
 
-  type Timer = ReturnType<typeof setInterval>;
-  let interval: Timer | undefined;
+  type Timer = ReturnType<typeof setInterval>
+  let interval: Timer | undefined
   const toggle = () => {
     if (running()) {
-      clearInterval(interval);
-      interval = undefined;
+      clearInterval(interval)
+      interval = undefined
 
       setUserState(
-        "projectGroups",
+        'projectGroups',
         groupIndex,
-        "projects",
+        'projects',
         projectIndex,
-        "logs",
+        'logs',
         runningIndex(),
         produce((log) => {
-          log.endedAt = Date.now();
-          log.done = true;
+          log.endedAt = Date.now()
+          log.done = true
         })
-      );
+      )
     } else {
       setUserState(
-        "projectGroups",
+        'projectGroups',
         groupIndex,
-        "projects",
+        'projects',
         projectIndex,
-        "logs",
+        'logs',
         project.logs.length,
         {
           id: crypto.randomUUID(),
           startedAt: Date.now(),
           endedAt: Date.now(),
           done: false,
-          comment: "",
+          comment: '',
         }
-      );
+      )
     }
 
     interval = setInterval(() => {
-      if (!running()) return;
+      if (!running()) return
       setUserState(
-        "projectGroups",
+        'projectGroups',
         groupIndex,
-        "projects",
+        'projects',
         projectIndex,
-        "logs",
+        'logs',
         runningIndex(),
-        "endedAt",
+        'endedAt',
         Date.now()
-      );
-    }, 1000);
-  };
+      )
+    }, 1000)
+  }
 
   return (
     <main class="p-5">
@@ -134,10 +134,10 @@ export const ProjectPage: Component = () => {
             <div
               class="badge-sm uppercase font-bold badge"
               classList={{
-                "badge-error": !project.paid,
+                'badge-error': !project.paid,
               }}
             >
-              {project.paid ? "Paid" : "Unpaid"} Project
+              {project.paid ? 'Paid' : 'Unpaid'} Project
             </div>
           </h2>
           <p>{project.description}</p>
@@ -168,7 +168,7 @@ export const ProjectPage: Component = () => {
                 </span>
                 <span class="text-3xl flex gap-1">
                   <span class="font-semibold">
-                    {round((totalLoggedTime() / 3600) * project.hourlyRate!, 2)}{" "}
+                    {round((totalLoggedTime() / 3600) * project.hourlyRate!, 2)}{' '}
                   </span>
                   <span>{project.currency}</span>
                 </span>
@@ -215,8 +215,8 @@ export const ProjectPage: Component = () => {
               <div
                 class="p-5 rounded"
                 classList={{
-                  "bg-base-300": log.done,
-                  "bg-green-900": !log.done,
+                  'bg-base-300': log.done,
+                  'bg-green-900': !log.done,
                 }}
               >
                 {/* Log Title */}
@@ -227,10 +227,10 @@ export const ProjectPage: Component = () => {
                   <div
                     class="uppercase font-bold badge badge-sm"
                     classList={{
-                      "badge-success": log.done,
+                      'badge-success': log.done,
                     }}
                   >
-                    {log.done ? "Done" : "Ongoing"}
+                    {log.done ? 'Done' : 'Ongoing'}
                   </div>
                 </h3>
 
@@ -245,8 +245,8 @@ export const ProjectPage: Component = () => {
                   </span>
                   <span>
                     {new Date(log.startedAt).toLocaleString(undefined, {
-                      dateStyle: "full",
-                      timeStyle: "medium",
+                      dateStyle: 'full',
+                      timeStyle: 'medium',
                     })}
                   </span>
                   <span class="uppercase text-xs font-semibold tracking-wider text-right">
@@ -254,8 +254,8 @@ export const ProjectPage: Component = () => {
                   </span>
                   <span>
                     {new Date(log.endedAt).toLocaleString(undefined, {
-                      dateStyle: "full",
-                      timeStyle: "medium",
+                      dateStyle: 'full',
+                      timeStyle: 'medium',
                     })}
                   </span>
                   <span class="uppercase text-xs font-semibold tracking-wider text-right">
@@ -267,23 +267,23 @@ export const ProjectPage: Component = () => {
                   <span class="uppercase text-xs font-semibold tracking-wider text-right">
                     Comment:
                   </span>
-                  <span>{log.comment || "None"}</span>
+                  <span>{log.comment || 'None'}</span>
                 </div>
 
                 {/* Modals */}
                 <CommentLogModal
-                  comment={() => selectedLog()?.comment ?? ""}
+                  comment={() => selectedLog()?.comment ?? ''}
                   setComment={(comment) => {
                     setUserState(
-                      "projectGroups",
+                      'projectGroups',
                       groupIndex,
-                      "projects",
+                      'projects',
                       projectIndex,
-                      "logs",
+                      'logs',
                       project.logs.indexOf(selectedLog()!),
-                      "comment",
+                      'comment',
                       comment
-                    );
+                    )
                   }}
                 />
 
@@ -313,7 +313,7 @@ export const ProjectPage: Component = () => {
         </div>
       </Show>
     </main>
-  );
-};
+  )
+}
 
-export default ProjectPage;
+export default ProjectPage
