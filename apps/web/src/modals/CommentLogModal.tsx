@@ -9,7 +9,7 @@ interface Props {
   setComment: (comment: string) => void;
 }
 
-export const CommentLog: Component<Props> = (props) => {
+export const CommentLogModal: Component<Props> = (props) => {
   const [open, setOpen] = createSignal<boolean>(false);
 
   const formSchema = z.object({
@@ -82,3 +82,5 @@ export const CommentLog: Component<Props> = (props) => {
     </>
   );
 };
+
+export default CommentLogModal;

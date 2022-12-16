@@ -14,3 +14,5 @@ export const Navbar: Component = () => {
     </div>
   );
 };
+
+export default Navbar;

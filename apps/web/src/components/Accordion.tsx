@@ -49,3 +49,5 @@ export const Accordion: <T>(props: Props<T>) => JSXElement = (props) => {
     </div>
   );
 };
+
+export default Accordion;

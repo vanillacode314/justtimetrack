@@ -5,6 +5,7 @@ import { z, ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { IProject } from "~/types";
 import { toast } from "~/components/Toast";
+
 export const AddNewProjectModal: Component = () => {
   const [userState, setUserState] = useUserState();
 
@@ -218,3 +219,5 @@ export const AddNewProjectModal: Component = () => {
     </>
   );
 };
+
+export default AddNewProjectModal;

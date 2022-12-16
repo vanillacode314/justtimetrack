@@ -17,7 +17,7 @@ import "@unocss/reset/tailwind.css";
 import "@kidonng/daisyui/index.css";
 import "virtual:uno.css";
 import Base from "~/layouts/Base";
-import { AddNewProjectModal } from "./modals/AddNewProject";
+import { AddNewProjectModal } from "./modals/AddNewProjectModal";
 
 export const Root: Component = () => {
   return (

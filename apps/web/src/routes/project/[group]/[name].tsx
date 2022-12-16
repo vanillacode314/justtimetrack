@@ -1,7 +1,7 @@
 import { Show, For, createSignal, Component } from "solid-js";
 import { produce } from "solid-js/store";
 import { useNavigate, useParams } from "solid-start";
-import { CommentLog } from "~/modals/CommentLog";
+import { CommentLogModal } from "~/modals/CommentLogModal";
 import { useUserState } from "~/stores";
 import { IActivityLog, IProject } from "~/types";
 import { formatSeconds, round } from "~/utils";
@@ -16,13 +16,14 @@ export const ProjectPage: Component = () => {
 
   const [error, setError] = createSignal<string>("");
 
-  // find project
+  // find group
   const groupIndex = userState.projectGroups.findIndex(
     (group) => group.id === params.group
   );
   const group = userState.projectGroups[groupIndex];
   if (groupIndex === -1) setError(`group with id ${params.group} not found`);
 
+  // find project
   let project!: IProject;
   let projectIndex: number;
 
@@ -41,6 +42,7 @@ export const ProjectPage: Component = () => {
   const runningIndex = () => project.logs.findIndex((log) => !log.done);
   const running = () => runningIndex() !== -1;
 
+  // utils
   const totalLoggedTime = () =>
     project.logs.reduce((sum, log) => sum + (log.endedAt - log.startedAt), 0) /
     1000;
@@ -67,7 +69,8 @@ export const ProjectPage: Component = () => {
     );
   };
 
-  let interval: ReturnType<typeof setInterval> | undefined;
+  type Timer = ReturnType<typeof setInterval>;
+  let interval: Timer | undefined;
   const toggle = () => {
     if (running()) {
       clearInterval(interval);
@@ -268,7 +271,7 @@ export const ProjectPage: Component = () => {
                 </div>
 
                 {/* Modals */}
-                <CommentLog
+                <CommentLogModal
                   comment={() => selectedLog()?.comment ?? ""}
                   setComment={(comment) => {
                     setUserState(

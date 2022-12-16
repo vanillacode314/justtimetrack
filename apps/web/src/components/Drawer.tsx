@@ -119,3 +119,5 @@ export const Drawer: Component<Props> = (props) => {
     </div>
   );
 };
+
+export default Drawer;
