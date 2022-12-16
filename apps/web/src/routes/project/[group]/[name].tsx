@@ -236,7 +236,7 @@ export const ProjectPage: Component = () => {
                   <span class="uppercase text-xs font-semibold tracking-wider text-right">
                     ID:
                   </span>
-                  <span>{log.id}</span>
+                  <span class="hyphens-auto break-all">{log.id}</span>
                   <span class="uppercase text-xs font-semibold tracking-wider text-right">
                     Started At:
                   </span>
@@ -286,7 +286,7 @@ export const ProjectPage: Component = () => {
 
                 {/* Log Action Buttons */}
                 {log.done && (
-                  <div class="flex gap-3 justify-end mt-5">
+                  <div class="flex gap-3 justify-end mt-auto pt-5">
                     <label
                       class="btn btn-sm flex gap-1 items-center"
                       for="comment-log-modal"
