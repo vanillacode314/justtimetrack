@@ -1,6 +1,7 @@
 import { Show, For, createSignal, Component } from "solid-js";
 import { produce } from "solid-js/store";
 import { useNavigate, useParams } from "solid-start";
+import { CommentLog } from "~/modals/CommentLog";
 import { useUserState } from "~/stores";
 import { IActivityLog, IProject } from "~/types";
 import { formatSeconds, round } from "~/utils";
@@ -11,8 +12,11 @@ export const ProjectPage: Component = () => {
   const params = useParams();
   const navigate = useNavigate();
 
+  const [selectedLog, setSelectedLog] = createSignal<IActivityLog>();
+
   const [error, setError] = createSignal<string>("");
 
+  // find project
   const groupIndex = userState.projectGroups.findIndex(
     (group) => group.id === params.group
   );
@@ -33,6 +37,7 @@ export const ProjectPage: Component = () => {
     else project = group.projects[projectIndex];
   }
 
+  // check if a log is ongoing
   const runningIndex = () => project.logs.findIndex((log) => !log.done);
   const running = () => runningIndex() !== -1;
 
@@ -62,7 +67,7 @@ export const ProjectPage: Component = () => {
     );
   };
 
-  let interval: number | undefined;
+  let interval: ReturnType<typeof setInterval> | undefined;
   const toggle = () => {
     if (running()) {
       clearInterval(interval);
@@ -262,9 +267,34 @@ export const ProjectPage: Component = () => {
                   <span>{log.comment || "None"}</span>
                 </div>
 
+                {/* Modals */}
+                <CommentLog
+                  comment={() => selectedLog()?.comment ?? ""}
+                  setComment={(comment) => {
+                    setUserState(
+                      "projectGroups",
+                      groupIndex,
+                      "projects",
+                      projectIndex,
+                      "logs",
+                      project.logs.indexOf(selectedLog()!),
+                      "comment",
+                      comment
+                    );
+                  }}
+                />
+
                 {/* Log Action Buttons */}
                 {log.done && (
-                  <div class="flex gap-3 justify-end">
+                  <div class="flex gap-3 justify-end mt-5">
+                    <label
+                      class="btn btn-sm flex gap-1 items-center"
+                      for="comment-log-modal"
+                      onClick={() => setSelectedLog(log)}
+                    >
+                      <span class="i-carbon-edit"></span>
+                      <span>Comment</span>
+                    </label>
                     <button
                       class="btn btn-sm flex gap-1 items-center btn-ghost text-error"
                       onClick={() => removeLog(log.id)}
