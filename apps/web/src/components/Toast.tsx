@@ -28,6 +28,7 @@ interface ToastOptions {
   duration: number
   type: MessageType
 }
+
 export const toast = (
   title: string,
   content: string,
@@ -61,7 +62,7 @@ export const Toast: Component = () => {
                 {icon && <div class={`${icon} text-base`}></div>}
                 {title}
               </span>
-              <span class="whitespace-pre-line">{content}</span>
+              {content && <span class="whitespace-pre-line">{content}</span>}
             </div>
           </div>
         )}

@@ -1,6 +1,5 @@
-export function sleep(duration: number): Promise<void> {
-  return new Promise<void>((resolve) => setTimeout(resolve, duration))
-}
+export const sleep = (duration: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, duration))
 
 export function round(input: number, precision: number = 2): number {
   const p = Math.pow(10, precision)

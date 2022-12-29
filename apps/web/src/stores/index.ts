@@ -48,12 +48,19 @@ const [appState, setAppState] = createStore<IAppState>({
   drawerVisible: false,
 })
 
+export const GET_DEFAULT_USER_STATE: () => IUserState = () => ({
+  projectGroups: [],
+})
+
 const [userState, setUserState] = createLocalStorageStore<IUserState>(
   'user-state',
-  {
-    projectGroups: [],
-  }
+  GET_DEFAULT_USER_STATE()
 )
 
 export const useAppState = () => [appState, setAppState] as const
-export const useUserState = () => [userState, setUserState] as const
+export const useUserState = () =>
+  [
+    userState,
+    setUserState,
+    () => setUserState(GET_DEFAULT_USER_STATE()),
+  ] as const
