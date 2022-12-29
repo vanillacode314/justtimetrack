@@ -1,5 +1,6 @@
 import { Component } from 'solid-js'
 import { toast } from '~/components/Toast'
+import ConfirmModal from '~/modals/ConfirmModal'
 import { useUserState } from '~/stores'
 
 export const SettingsPage: Component = () => {
@@ -7,16 +8,19 @@ export const SettingsPage: Component = () => {
 
   return (
     <section class="p-5 flex flex-col" aria-label="settings">
-      <button
-        type="button"
-        class="btn btn-error"
-        onClick={() => {
+      <ConfirmModal
+        id="clear-data-modal"
+        title="Clear Data"
+        message="Are you sure you want to clear all data?"
+        onConfirm={() => {
           resetUserState()
           toast('Cleared Data Successfully', '', { type: 'success' })
         }}
       >
-        Clear Data
-      </button>
+        <label for="clear-data-modal" class="btn btn-error">
+          Clear Data
+        </label>
+      </ConfirmModal>
     </section>
   )
 }
