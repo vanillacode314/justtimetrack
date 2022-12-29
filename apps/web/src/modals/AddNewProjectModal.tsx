@@ -1,4 +1,4 @@
-import { createSignal, Show, Component, For } from 'solid-js'
+import { createEffect, createSignal, Show, Component, For } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import { useUserState } from '~/stores'
 import { z, ZodError } from 'zod'
@@ -7,6 +7,8 @@ import { IProject } from '~/types'
 import { toast } from '~/components/Toast'
 
 export const AddNewProjectModal: Component = () => {
+  let selectElement!: HTMLSelectElement
+
   const [userState, setUserState] = useUserState()
 
   const [open, setOpen] = createSignal<boolean>(false)
@@ -59,6 +61,85 @@ export const AddNewProjectModal: Component = () => {
     setFormData('group', groupName)
   }
 
+  function onSubmit(e) {
+    e.preventDefault()
+    try {
+      formSchema.parse(formData)
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const validationError = fromZodError(err)
+
+        let message = validationError.message
+        message = message.slice(message.indexOf(':') + 1)
+        message = message.replaceAll(';', '\n').trim()
+
+        toast('Invalid Input', message, {
+          type: 'error',
+        })
+      }
+      return
+    }
+
+    const groupIndex = userState.projectGroups.findIndex(
+      (g) => g.name === formData.group
+    )
+    if (groupIndex === -1) throw new Error('group not found')
+
+    // check if project with same name already exists in the group
+
+    if (
+      userState.projectGroups[groupIndex].projects.some(
+        (project) => project.name === formData.name
+      )
+    ) {
+      toast(
+        'Project Already Exists',
+        `Project with name ${formData.name} already exists in the group ${formData.group}`,
+        {
+          type: 'error',
+        }
+      )
+      return
+    }
+
+    setUserState(
+      'projectGroups',
+      groupIndex,
+      'projects',
+      userState.projectGroups[groupIndex].projects.length,
+      (formData.paid
+        ? {
+            id: formData.name.toLowerCase().replaceAll(' ', '-'),
+            name: formData.name,
+            description: '',
+            paid: true,
+            logs: [],
+            hourlyRate: formData.hourlyRate,
+            currency: formData.currency,
+          }
+        : {
+            id: formData.name.toLowerCase().replaceAll(' ', '-'),
+            name: formData.name,
+            description: '',
+            logs: [],
+            paid: false,
+          }) as IProject
+    )
+    toast(
+      'Successfully added new project',
+      `Project ${formData.name} added under group ${formData.group}`,
+      {
+        type: 'success',
+      }
+    )
+    setFormData(getDefaultData())
+    setOpen(false)
+  }
+
+  createEffect(() => {
+    open() && selectElement.focus()
+  })
+
   return (
     <>
       <input
@@ -71,85 +152,10 @@ export const AddNewProjectModal: Component = () => {
       <label for="add-new-project-modal" class="modal">
         <label class="modal-box rounded-xl">
           <h3 class="font-bold text-lg">Add New Project</h3>
-          <form
-            class="py-5 flex flex-col gap-3"
-            onSubmit={(e) => {
-              e.preventDefault()
-              try {
-                formSchema.parse(formData)
-              } catch (err) {
-                if (err instanceof ZodError) {
-                  const validationError = fromZodError(err)
-
-                  let message = validationError.message
-                  message = message.slice(message.indexOf(':') + 1)
-                  message = message.replaceAll(';', '\n').trim()
-
-                  toast('Invalid Input', message, {
-                    type: 'error',
-                  })
-                }
-                return
-              }
-
-              const groupIndex = userState.projectGroups.findIndex(
-                (g) => g.name === formData.group
-              )
-              if (groupIndex === -1) throw new Error('group not found')
-
-              // check if project with same name already exists in the group
-
-              if (
-                userState.projectGroups[groupIndex].projects.some(
-                  (project) => project.name === formData.name
-                )
-              ) {
-                toast(
-                  'Project Already Exists',
-                  `Project with name ${formData.name} already exists in the group ${formData.group}`,
-                  {
-                    type: 'error',
-                  }
-                )
-                return
-              }
-
-              setUserState(
-                'projectGroups',
-                groupIndex,
-                'projects',
-                userState.projectGroups[groupIndex].projects.length,
-                (formData.paid
-                  ? {
-                      id: formData.name.toLowerCase().replaceAll(' ', '-'),
-                      name: formData.name,
-                      description: '',
-                      paid: true,
-                      logs: [],
-                      hourlyRate: formData.hourlyRate,
-                      currency: formData.currency,
-                    }
-                  : {
-                      id: formData.name.toLowerCase().replaceAll(' ', '-'),
-                      name: formData.name,
-                      description: '',
-                      logs: [],
-                      paid: false,
-                    }) as IProject
-              )
-              toast(
-                'Successfully added new project',
-                `Project ${formData.name} added under group ${formData.group}`,
-                {
-                  type: 'success',
-                }
-              )
-              setFormData(getDefaultData())
-              setOpen(false)
-            }}
-          >
+          <form class="py-5 flex flex-col gap-3" onSubmit={onSubmit}>
             <span class="grid grid-cols-[1fr_auto] gap-3">
               <select
+                ref={selectElement}
                 value={formData.group}
                 onChange={(e) => setFormData('group', e.currentTarget.value)}
                 class="select select-bordered w-full"

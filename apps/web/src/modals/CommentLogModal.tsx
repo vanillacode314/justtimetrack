@@ -1,4 +1,4 @@
-import { createSignal, Component } from 'solid-js'
+import { createEffect, createSignal, Component } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import { z, ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
@@ -10,6 +10,8 @@ interface Props {
 }
 
 export const CommentLogModal: Component<Props> = (props) => {
+  let inputElement!: HTMLInputElement
+
   const [open, setOpen] = createSignal<boolean>(false)
 
   const formSchema = z.object({
@@ -22,6 +24,16 @@ export const CommentLogModal: Component<Props> = (props) => {
   })
   const [formData, setFormData] = createStore<formSchemaType>(getDefaultData())
 
+  createEffect(() => {
+    if (open()) {
+      inputElement.focus()
+
+      // select all
+      inputElement.selectionStart = 0
+      inputElement.selectionEnd = inputElement.value.length
+    }
+  })
+
   return (
     <>
       <input
@@ -32,7 +44,7 @@ export const CommentLogModal: Component<Props> = (props) => {
         onChange={(e) => setOpen(e.currentTarget.checked)}
       />
       <label for="comment-log-modal" class="modal">
-        <label class="modal-box">
+        <label class="modal-box rounded-xl">
           <h3 class="font-bold text-lg">Comment Log</h3>
           <form
             class="py-5 flex flex-col gap-3"
@@ -65,6 +77,7 @@ export const CommentLogModal: Component<Props> = (props) => {
             }}
           >
             <input
+              ref={inputElement}
               type="text"
               placeholder="Write your comment here"
               class="input input-bordered w-full"
@@ -72,7 +85,7 @@ export const CommentLogModal: Component<Props> = (props) => {
               onInput={(e) => setFormData('comment', e.currentTarget.value)}
             />
             <div class="modal-action">
-              <button class="btn uppercase flex gap-2 items-center">
+              <button class="btn uppercase flex gap-2 items-center btn-success">
                 <div class="text-lg i-carbon-edit"></div> Comment
               </button>
             </div>
