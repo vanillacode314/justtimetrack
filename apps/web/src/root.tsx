@@ -13,9 +13,6 @@ import {
   Title,
 } from 'solid-start'
 
-import '@unocss/reset/tailwind.css'
-import '@kidonng/daisyui/index.css'
-import 'virtual:uno.css'
 import Base from '~/layouts/Base'
 import { AddNewProjectModal } from './modals/AddNewProjectModal'
 
