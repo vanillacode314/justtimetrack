@@ -2,6 +2,7 @@ import { Show, For, createSignal, Component } from 'solid-js'
 import { produce } from 'solid-js/store'
 import { useNavigate, useParams } from 'solid-start'
 import { CommentLogModal } from '~/modals/CommentLogModal'
+import ConfirmModal from '~/modals/ConfirmModal'
 import { useUserState } from '~/stores'
 import { IActivityLog, IProject } from '~/types'
 import { formatSeconds, round } from '~/utils'
@@ -127,7 +128,7 @@ export const ProjectPage: Component = () => {
         when={!error()}
         fallback={<div class="alert alert-error">{error}</div>}
       >
-        <div class="bg-green-900 px-5 py-3 rounded flex flex-col gap-3">
+        <div class="bg-green-900 p-5 rounded-xl flex flex-col gap-3">
           <h2 class="flex justify-between uppercase font-bold items-baseline">
             {/* Project Details */}
             <span>{project.name}</span>
@@ -198,13 +199,20 @@ export const ProjectPage: Component = () => {
               <div class="i-carbon-printer"></div>
               <span>Print</span>
             </button>
-            <button
-              class="btn btn-ghost text-error btn-sm flex gap-1 items-center"
-              onClick={removeProject}
+            <ConfirmModal
+              id="delete-project-modal"
+              title="Delete Project"
+              message="Are you sure you would like to delete this project?"
+              onConfirm={removeProject}
             >
-              <div class="i-carbon-delete"></div>
-              <span>Delete</span>
-            </button>
+              <label
+                for="delete-project-modal"
+                class="btn btn-ghost text-error btn-sm flex gap-1 items-center"
+              >
+                <div class="i-carbon-delete"></div>
+                <span>Delete</span>
+              </label>
+            </ConfirmModal>
           </div>
         </div>
 

@@ -26,7 +26,7 @@ export const ConfirmModal: Component<Props> = (props) => {
         <label class="modal-box rounded-xl flex flex-col gap-3">
           <h3 class="font-bold text-lg">{props.title}</h3>
           <p>{props.message}</p>
-          <div class="flex gap-3 justify-end">
+          <div class="flex gap-3 justify-end mt-5">
             <label
               class="btn btn-ghost text-success flex gap-3 items-center"
               onClick={() => {
