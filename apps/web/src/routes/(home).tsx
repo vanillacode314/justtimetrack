@@ -11,7 +11,7 @@ export default function Home() {
       <Show
         when={userState.projectGroups.length > 0}
         fallback={
-          <div class="grid justify-items-center place-content-center gap-5 h-full">
+          <div class="text-center grid justify-items-center place-content-center gap-5 h-full">
             <p class="uppercase font-bold text-4xl">You have no projects yet</p>
             <label
               for="add-new-project-modal"
@@ -33,7 +33,7 @@ export default function Home() {
             <Show
               when={projects.length > 0}
               fallback={
-                <div class="flex flex-col items-center gap-5 h-full p-5">
+                <div class="text-center flex flex-col items-center gap-5 h-full p-5">
                   <p class="uppercase font-bold">Empty Group</p>
                   <label
                     for="add-new-project-modal"
