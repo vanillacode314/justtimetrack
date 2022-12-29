@@ -32,7 +32,18 @@ export default function Home() {
           {({ id: groupId, name: groupName, projects }) => (
             <Show
               when={projects.length > 0}
-              fallback={<div class="p-5">No projects in this group yet.</div>}
+              fallback={
+                <div class="flex flex-col items-center gap-5 h-full p-5">
+                  <p class="uppercase font-bold">Empty Group</p>
+                  <label
+                    for="add-new-project-modal"
+                    class="flex gap-1 items-center btn btn-primary"
+                  >
+                    <div class="i-carbon-add text-xl" />
+                    <span>Add new project</span>
+                  </label>
+                </div>
+              }
             >
               <div class="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-3 p-5">
                 <For each={projects}>
