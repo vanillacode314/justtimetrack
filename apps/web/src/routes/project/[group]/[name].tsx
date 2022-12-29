@@ -241,21 +241,31 @@ export const ProjectPage: Component = () => {
                   </span>
                   <span class="hyphens-auto break-all">{log.id}</span>
                   <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                    Started At:
+                    Start:
                   </span>
                   <span>
                     {new Date(log.startedAt).toLocaleString(undefined, {
-                      dateStyle: 'full',
-                      timeStyle: 'medium',
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      weekday: 'short',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      second: 'numeric',
                     })}
                   </span>
                   <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                    Ended At:
+                    End:
                   </span>
                   <span>
                     {new Date(log.endedAt).toLocaleString(undefined, {
-                      dateStyle: 'full',
-                      timeStyle: 'medium',
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      weekday: 'short',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      second: 'numeric',
                     })}
                   </span>
                   <span class="uppercase text-xs font-semibold tracking-wider text-right">
