@@ -29,6 +29,36 @@ export const AddNewProjectModal: Component = () => {
     getDefaultData()
   )
 
+  const addNewGroup = () => {
+    const groupName = prompt('Enter group name')
+    if (groupName === null) {
+      toast('Invalid group name', 'Group name must be alphanumeric', {
+        type: 'error',
+      })
+      return
+    }
+    if (userState.projectGroups.some((group) => group.name === groupName)) {
+      toast(
+        'Group Already Exists',
+        `Group with name ${groupName} already exists`,
+        {
+          type: 'error',
+        }
+      )
+      return
+    }
+
+    setUserState('projectGroups', (_) => [
+      ..._,
+      {
+        id: groupName.toLowerCase().replaceAll(' ', '-'),
+        name: groupName,
+        projects: [],
+      },
+    ])
+    setFormData('group', groupName)
+  }
+
   return (
     <>
       <input
@@ -39,7 +69,7 @@ export const AddNewProjectModal: Component = () => {
         onChange={(e) => setOpen(e.currentTarget.checked)}
       />
       <label for="add-new-project-modal" class="modal">
-        <label class="modal-box">
+        <label class="modal-box rounded-xl">
           <h3 class="font-bold text-lg">Add New Project</h3>
           <form
             class="py-5 flex flex-col gap-3"
@@ -118,58 +148,23 @@ export const AddNewProjectModal: Component = () => {
               setOpen(false)
             }}
           >
-            <select
-              value={formData.group}
-              onChange={(e) => setFormData('group', e.currentTarget.value)}
-              class="select select-bordered w-full"
-            >
-              <option value="" disabled>
-                Select project group
-              </option>
-              <For each={userState.projectGroups}>
-                {({ name }) => <option>{name}</option>}
-              </For>
-              <option
-                value="new"
-                onClick={() => {
-                  const groupName = prompt('Enter group name')
-                  if (groupName === null) {
-                    toast(
-                      'Invalid group name',
-                      'Group name must be alphanumeric',
-                      {
-                        type: 'error',
-                      }
-                    )
-                    return
-                  }
-                  if (
-                    userState.projectGroups.some(
-                      (group) => group.name === groupName
-                    )
-                  ) {
-                    toast(
-                      'Group Already Exists',
-                      `Group with name ${groupName} already exists`,
-                      {
-                        type: 'error',
-                      }
-                    )
-                  }
-                  setUserState('projectGroups', (_) => [
-                    ..._,
-                    {
-                      id: groupName.toLowerCase().replaceAll(' ', '-'),
-                      name: groupName,
-                      projects: [],
-                    },
-                  ])
-                  setFormData('group', groupName)
-                }}
+            <span class="grid grid-cols-[1fr_auto] gap-3">
+              <select
+                value={formData.group}
+                onChange={(e) => setFormData('group', e.currentTarget.value)}
+                class="select select-bordered w-full"
               >
+                <option value="" disabled>
+                  Select project group
+                </option>
+                <For each={userState.projectGroups}>
+                  {({ name }) => <option>{name}</option>}
+                </For>
+              </select>
+              <button type="button" class="btn" onClick={() => addNewGroup()}>
                 New Group
-              </option>
-            </select>
+              </button>
+            </span>
             <input
               type="text"
               placeholder="Project Name"
@@ -209,7 +204,7 @@ export const AddNewProjectModal: Component = () => {
               </>
             </Show>
             <div class="modal-action">
-              <button class="btn uppercase flex gap-2 items-center">
+              <button class="btn btn-primary uppercase flex gap-2 items-center">
                 <div class="text-lg i-mdi-plus"></div> Add
               </button>
             </div>
