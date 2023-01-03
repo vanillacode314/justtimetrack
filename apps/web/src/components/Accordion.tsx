@@ -25,7 +25,13 @@ export const Accordion: <T>(props: Props<T>) => JSXElement = (props) => {
     <div class="flex flex-col gap-5">
       <For each={props.items}>
         {({ title, data }, index) => (
-          <div class="rounded bg-stone-900 shadow">
+          <div
+            class="rounded group bg-stone-900 shadow transition-colors"
+            classList={{
+              'focus:bg-stone-800 hover:bg-stone-800':
+                activeIndex() !== index(),
+            }}
+          >
             <button
               onClick={() => activate(index())}
               class="text-xl font-medium w-full text-left flex justify-between items-center p-5"

@@ -1,6 +1,7 @@
-import solid from 'solid-start/vite'
 import { defineConfig } from 'vite'
-import path from 'path'
+
+import solid from 'solid-start/vite'
+
 import Unocss from 'unocss/vite'
 import {
   transformerDirectives,
@@ -8,9 +9,13 @@ import {
   presetIcons,
   presetWebFonts,
 } from 'unocss'
-import packageJson from './package.json' assert { type: 'json' }
 import presetDaisy from 'unocss-preset-daisy'
+
 import vercel from 'solid-start-vercel'
+import node from 'solid-start-node'
+
+import path from 'path'
+import packageJson from './package.json' assert { type: 'json' }
 
 export default defineConfig({
   define: {

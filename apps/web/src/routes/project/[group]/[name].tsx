@@ -1,3 +1,5 @@
+import { onCleanup } from 'solid-js'
+import { createEffect } from 'solid-js'
 import { Show, For, createSignal, Component } from 'solid-js'
 import { produce } from 'solid-js/store'
 import { useNavigate, useParams } from 'solid-start'
@@ -72,11 +74,29 @@ export const ProjectPage: Component = () => {
 
   type Timer = ReturnType<typeof setInterval>
   let interval: Timer | undefined
+  createEffect(() => {
+    if (!running()) return
+    clearInterval(interval)
+    interval = setInterval(() => {
+      if (!running()) {
+        clearInterval(interval)
+        interval = undefined
+        return
+      }
+      setUserState(
+        'projectGroups',
+        groupIndex,
+        'projects',
+        projectIndex,
+        'logs',
+        runningIndex(),
+        'endedAt',
+        Date.now()
+      )
+    }, 1000)
+  })
   const toggle = () => {
     if (running()) {
-      clearInterval(interval)
-      interval = undefined
-
       setUserState(
         'projectGroups',
         groupIndex,
@@ -106,20 +126,6 @@ export const ProjectPage: Component = () => {
         }
       )
     }
-
-    interval = setInterval(() => {
-      if (!running()) return
-      setUserState(
-        'projectGroups',
-        groupIndex,
-        'projects',
-        projectIndex,
-        'logs',
-        runningIndex(),
-        'endedAt',
-        Date.now()
-      )
-    }, 1000)
   }
 
   return (
