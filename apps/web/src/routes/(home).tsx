@@ -1,8 +1,3 @@
-import { For, Show } from 'solid-js'
-import { produce } from 'solid-js/store'
-import { A } from 'solid-start'
-import { Accordion } from '~/components/Accordion'
-import { useUserState } from '~/stores'
 import { IProject, IProjectGroup } from '~/types'
 
 export default function HomePage() {
@@ -20,15 +15,11 @@ export default function HomePage() {
   }
 
   function pauseProject(group: IProjectGroup, project: IProject) {
-    const groupIndex = userState.projectGroups.findIndex(
-      ({ id }) => id === group.id
-    )
-    const projectIndex = group.projects.findIndex(({ id }) => id === project.id)
     setUserState(
       'projectGroups',
-      groupIndex,
+      ({ id }) => id === group.id,
       'projects',
-      projectIndex,
+      ({ id }) => id === project.id,
       'logs',
       project.logs.length - 1,
       produce((log) => {
@@ -63,17 +54,25 @@ export default function HomePage() {
             <div class="flex gap-5">
               <For each={runningProjects()}>
                 {({ group, project }) => (
-                  <div class="p-5 rounded bg-green-900 flex gap-5 items-center justify-between">
+                  <A
+                    class="p-5 rounded bg-green-900 flex gap-5 items-center justify-between cursor-pointer hover:bg-green-800 hover:shadow-none shadow"
+                    href={`/project/${group.id}/${project.id}`}
+                  >
                     <h2 class="font-bold uppercase">
                       {group.name} / {project.name}
                     </h2>
                     <button
                       class="bg-stone-900 rounded-full aspect-square p-3 grid place-content-center hover:bg-stone-800 focus:bg-stone-800"
-                      onClick={() => pauseProject(group, project)}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        pauseProject(group, project)
+                      }}
                     >
                       <span class="i-carbon-pause-filled"></span>
                     </button>
-                  </div>
+                  </A>
                 )}
               </For>
             </div>
@@ -89,7 +88,7 @@ export default function HomePage() {
               data: group,
             }))}
           >
-            {({ id: groupId, name: groupName, projects }) => (
+            {({ id: groupId, name: _groupName, projects }) => (
               <Show
                 when={projects.length > 0}
                 fallback={

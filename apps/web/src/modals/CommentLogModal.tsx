@@ -1,8 +1,8 @@
-import { createEffect, createSignal, Component } from 'solid-js'
-import { createStore } from 'solid-js/store'
+import { Component } from 'solid-js'
 import { z, ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 import { toast } from '~/components/Toast'
+import BaseModal from './BaseModal'
 
 interface Props {
   comment: () => string
@@ -34,65 +34,58 @@ export const CommentLogModal: Component<Props> = (props) => {
     }
   })
 
+  function onSubmit() {
+    try {
+      formSchema.parse(formData)
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const validationError = fromZodError(err)
+
+        let message = validationError.message
+        message = message.slice(message.indexOf(':') + 1)
+        message = message.replaceAll(';', '\n').trim()
+
+        toast('Invalid Input', message, {
+          type: 'error',
+        })
+      }
+      return
+    }
+
+    props.setComment(formData.comment)
+
+    toast('Comment added successfully', ``, {
+      type: 'success',
+    })
+    setFormData(getDefaultData())
+    setOpen(false)
+  }
+
   return (
-    <>
-      <input
-        type="checkbox"
-        id="comment-log-modal"
-        class="modal-toggle"
-        checked={open()}
-        onChange={(e) => setOpen(e.currentTarget.checked)}
-      />
-      <label for="comment-log-modal" class="modal">
-        <label class="modal-box rounded-xl">
-          <h3 class="font-bold text-lg">Comment Log</h3>
-          <form
-            class="py-5 flex flex-col gap-3"
-            onSubmit={(e) => {
-              e.preventDefault()
-              try {
-                formSchema.parse(formData)
-              } catch (err) {
-                if (err instanceof ZodError) {
-                  const validationError = fromZodError(err)
-
-                  let message = validationError.message
-                  message = message.slice(message.indexOf(':') + 1)
-                  message = message.replaceAll(';', '\n').trim()
-
-                  toast('Invalid Input', message, {
-                    type: 'error',
-                  })
-                }
-                return
-              }
-
-              props.setComment(formData.comment)
-
-              toast('Comment added successfully', ``, {
-                type: 'success',
-              })
-              setFormData(getDefaultData())
-              setOpen(false)
-            }}
-          >
-            <input
-              ref={inputElement}
-              type="text"
-              placeholder="Write your comment here"
-              class="input input-bordered w-full"
-              value={formData.comment}
-              onInput={(e) => setFormData('comment', e.currentTarget.value)}
-            />
-            <div class="modal-action">
-              <button class="btn uppercase flex gap-2 items-center btn-success">
-                <div class="text-lg i-carbon-edit"></div> Comment
-              </button>
-            </div>
-          </form>
-        </label>
-      </label>
-    </>
+    <BaseModal id="comment-log-modal">
+      <div class="modal-box rounded-xl">
+        <h3 class="font-bold text-lg">Comment Log</h3>
+        <form
+          class="py-5 flex flex-col gap-3"
+          method="dialog"
+          onSubmit={onSubmit}
+        >
+          <input
+            ref={inputElement}
+            type="text"
+            placeholder="Write your comment here"
+            class="input input-bordered w-full"
+            value={formData.comment}
+            onInput={(e) => setFormData('comment', e.currentTarget.value)}
+          />
+          <div class="modal-action">
+            <button class="btn uppercase flex gap-2 items-center btn-success">
+              <div class="text-lg i-carbon-edit"></div> Comment
+            </button>
+          </div>
+        </form>
+      </div>
+    </BaseModal>
   )
 }
 

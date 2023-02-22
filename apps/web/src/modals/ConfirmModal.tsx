@@ -1,4 +1,5 @@
-import { createSignal, Component, JSXElement } from 'solid-js'
+import { Component, JSXElement } from 'solid-js'
+import BaseModal from './BaseModal'
 
 interface Props {
   id: string
@@ -11,23 +12,21 @@ interface Props {
 
 export const ConfirmModal: Component<Props> = (props) => {
   const { onConfirm, onCancel } = props
-
   const [open, setOpen] = createSignal<boolean>(false)
+
   return (
     <>
-      <input
-        type="checkbox"
+      <BaseModal
         id={props.id}
-        class="modal-toggle"
-        checked={open()}
-        onChange={(e) => setOpen(e.currentTarget.checked)}
-      />
-      <label for="add-new-project-modal" class="modal">
-        <label class="modal-box rounded-xl flex flex-col gap-3">
+        onClose={() => setOpen(false)}
+        onOpen={() => setOpen(true)}
+        open={open()}
+      >
+        <label class="modal-box rounded-xl flex flex-col gap-3 text-white">
           <h3 class="font-bold text-lg">{props.title}</h3>
           <p>{props.message}</p>
           <div class="flex gap-3 justify-end mt-5">
-            <label
+            <button
               class="btn btn-ghost text-success flex gap-3 items-center"
               onClick={() => {
                 setOpen(false)
@@ -36,8 +35,8 @@ export const ConfirmModal: Component<Props> = (props) => {
             >
               <div class="i-carbon-checkmark-filled"></div>
               <span>OK</span>
-            </label>
-            <label
+            </button>
+            <button
               class="btn"
               onClick={() => {
                 setOpen(false)
@@ -45,10 +44,10 @@ export const ConfirmModal: Component<Props> = (props) => {
               }}
             >
               <span>Cancel</span>
-            </label>
+            </button>
           </div>
         </label>
-      </label>
+      </BaseModal>
       {props.children}
     </>
   )

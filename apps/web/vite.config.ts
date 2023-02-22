@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import AutoImport from 'unplugin-auto-import/vite'
 
 import solid from 'solid-start/vite'
 
@@ -29,6 +30,17 @@ export default defineConfig({
     },
   },
   plugins: [
+    AutoImport({
+      imports: [
+        'solid-js',
+        '@solidjs/router',
+        {
+          'solid-start': ['A'],
+          'solid-js': ['createComputed'],
+        },
+      ],
+      dirs: ['./src/components/', './src/stores/', './src/utils/'],
+    }),
     solid({ ssr: false, adapter: vercel() }),
     Unocss({
       transformers: [transformerDirectives()],

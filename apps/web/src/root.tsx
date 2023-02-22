@@ -14,7 +14,7 @@ import {
 } from 'solid-start'
 
 import Base from '~/layouts/Base'
-import { AddNewProjectModal } from './modals/AddNewProjectModal'
+import { AddNewProjectModal } from '~/modals/AddNewProjectModal'
 
 export const Root: Component = () => {
   return (
@@ -31,7 +31,13 @@ export const Root: Component = () => {
       </Head>
       <Body>
         <Base>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense
+            fallback={
+              <div class="p-5 grid place-items-center">
+                <Spinner />
+              </div>
+            }
+          >
             <ErrorBoundary>
               <AddNewProjectModal />
               <Routes>

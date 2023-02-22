@@ -1,10 +1,7 @@
 import { Component, JSXElement } from 'solid-js'
-import { Drawer } from '~/components/Drawer'
-import { Navbar } from '~/components/Navbar'
-import Toast from '~/components/Toast'
 import '@unocss/reset/tailwind.css'
 import '@kidonng/daisyui/index.css'
-import 'virtual:uno.css'
+import 'uno.css'
 
 interface Props {
   children: JSXElement

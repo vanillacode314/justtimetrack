@@ -1,6 +1,5 @@
-import { For, Component, JSXElement } from 'solid-js'
+import { Component, JSXElement } from 'solid-js'
 import { A } from 'solid-start'
-import { useAppState } from '~/stores'
 
 interface Props {
   children: JSXElement

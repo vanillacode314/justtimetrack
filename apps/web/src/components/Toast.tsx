@@ -1,6 +1,4 @@
-import { For } from 'solid-js'
 import { Component } from 'solid-js'
-import { createStore } from 'solid-js/store'
 
 const uid = () => crypto.randomUUID()
 

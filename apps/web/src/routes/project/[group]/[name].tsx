@@ -1,13 +1,8 @@
-import { onCleanup } from 'solid-js'
-import { createEffect } from 'solid-js'
-import { Show, For, createSignal, Component } from 'solid-js'
-import { produce } from 'solid-js/store'
-import { useNavigate, useParams } from 'solid-start'
+import { Component } from 'solid-js'
+import { A } from 'solid-start'
 import { CommentLogModal } from '~/modals/CommentLogModal'
 import ConfirmModal from '~/modals/ConfirmModal'
-import { useUserState } from '~/stores'
 import { IActivityLog, IProject } from '~/types'
-import { formatSeconds, round } from '~/utils'
 
 export const ProjectPage: Component = () => {
   const [userState, setUserState] = useUserState()
@@ -74,6 +69,7 @@ export const ProjectPage: Component = () => {
 
   type Timer = ReturnType<typeof setInterval>
   let interval: Timer | undefined
+
   createEffect(() => {
     if (!running()) return
     clearInterval(interval)
@@ -95,6 +91,7 @@ export const ProjectPage: Component = () => {
       )
     }, 1000)
   })
+
   const toggle = () => {
     if (running()) {
       setUserState(
@@ -129,214 +126,228 @@ export const ProjectPage: Component = () => {
   }
 
   return (
-    <main class="p-5">
-      <Show
-        when={!error()}
-        fallback={<div class="alert alert-error">{error}</div>}
-      >
-        <div class="bg-green-900 p-5 rounded-xl flex flex-col gap-3">
-          <h2 class="flex justify-between uppercase font-bold items-baseline">
-            {/* Project Details */}
-            <span>{project.name}</span>
-            <div
-              class="badge-sm uppercase font-bold badge"
-              classList={{
-                'badge-error': !project.paid,
-              }}
-            >
-              {project.paid ? 'Paid' : 'Unpaid'} Project
-            </div>
-          </h2>
-          <p>{project.description}</p>
-          <div class="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] justify-between gap-3">
-            <span class="flex flex-col px-5 py-3 border-l-3 border-amber-500">
-              <span class="tracking-wider text-xs uppercase font-semibold">
-                Total Logged Time
-              </span>
-              <span class="text-3xl flex gap-1">
-                <span class="font-semibold">
-                  {formatTime(totalLoggedTime())}
-                </span>
-              </span>
-            </span>
-            <Show when={project.paid}>
+    <div class="flex flex-col gap-5 p-5">
+      <nav class="flex">
+        <A
+          class="p-2 bg-stone-800 grid place-content-center rounded-full"
+          href="/"
+          aria-label="go back"
+        >
+          <span class="i-carbon-arrow-left text-xl" />
+        </A>
+      </nav>
+      <main>
+        <Show
+          when={!error()}
+          fallback={<div class="alert alert-error">{error}</div>}
+        >
+          <div class="bg-green-900 p-5 rounded-xl flex flex-col gap-3">
+            <h2 class="flex justify-between uppercase font-bold items-baseline">
+              {/* Project Details */}
+              <span>{project.name}</span>
+              <div
+                class="badge-sm uppercase font-bold badge"
+                classList={{
+                  'badge-error': !project.paid,
+                }}
+              >
+                {project.paid ? 'Paid' : 'Unpaid'} Project
+              </div>
+            </h2>
+            <p>{project.description}</p>
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] justify-between gap-3">
               <span class="flex flex-col px-5 py-3 border-l-3 border-amber-500">
                 <span class="tracking-wider text-xs uppercase font-semibold">
-                  Hourly Rate
-                </span>
-                <span class="text-3xl flex gap-1">
-                  <span class="font-semibold">{project.hourlyRate}</span>
-                  {project.currency}/hr
-                </span>
-              </span>
-              <span class="flex flex-col px-5 py-3 border-l-3 border-amber-500">
-                <span class="tracking-wider text-xs uppercase font-semibold">
-                  Total Earnings
+                  Total Logged Time
                 </span>
                 <span class="text-3xl flex gap-1">
                   <span class="font-semibold">
-                    {round((totalLoggedTime() / 3600) * project.hourlyRate!, 2)}{' '}
+                    {formatTime(totalLoggedTime())}
                   </span>
-                  <span>{project.currency}</span>
                 </span>
               </span>
-            </Show>
-          </div>
+              <Show when={project.paid}>
+                <span class="flex flex-col px-5 py-3 border-l-3 border-amber-500">
+                  <span class="tracking-wider text-xs uppercase font-semibold">
+                    Hourly Rate
+                  </span>
+                  <span class="text-3xl flex gap-1">
+                    <span class="font-semibold">{project.hourlyRate}</span>
+                    {project.currency}/hr
+                  </span>
+                </span>
+                <span class="flex flex-col px-5 py-3 border-l-3 border-amber-500">
+                  <span class="tracking-wider text-xs uppercase font-semibold">
+                    Total Earnings
+                  </span>
+                  <span class="text-3xl flex gap-1">
+                    <span class="font-semibold">
+                      {round(
+                        (totalLoggedTime() / 3600) * project.hourlyRate!,
+                        2
+                      )}{' '}
+                    </span>
+                    <span>{project.currency}</span>
+                  </span>
+                </span>
+              </Show>
+            </div>
 
-          {/* Action Buttons */}
-          <div class="flex flex-col md:flex-row items-end justify-end gap-3 mt-3">
-            <button
-              class="btn btn-accent btn-sm flex gap-1 items-center"
-              onClick={() => toggle()}
-            >
-              {running() ? (
-                <>
-                  <div class="i-carbon-pause-filled"></div>
-                  <span>Stop</span>
-                </>
-              ) : (
-                <>
-                  <div class="i-carbon-play-filled-alt"></div>
-                  <span>Start</span>
-                </>
-              )}
-            </button>
-            <button class="btn btn-ghost btn-sm flex gap-1 items-center">
-              <div class="i-carbon-printer"></div>
-              <span>Print</span>
-            </button>
-            <ConfirmModal
-              id="delete-project-modal"
-              title="Delete Project"
-              message="Are you sure you would like to delete this project?"
-              onConfirm={removeProject}
-            >
-              <label
-                for="delete-project-modal"
-                class="btn btn-ghost text-error btn-sm flex gap-1 items-center"
+            {/* Action Buttons */}
+            <div class="flex flex-col md:flex-row items-end justify-end gap-3 mt-3">
+              <button
+                class="btn btn-accent btn-sm flex gap-1 items-center"
+                onClick={() => toggle()}
               >
-                <div class="i-carbon-delete"></div>
-                <span>Delete</span>
-              </label>
-            </ConfirmModal>
-          </div>
-        </div>
-
-        {/* Logs */}
-        <div class="py-5 grid grid-cols-[repeat(auto-fill,minmax(23rem,1fr))] gap-3">
-          <For each={project.logs}>
-            {(log, index) => (
-              <div
-                class="p-5 rounded"
-                classList={{
-                  'bg-base-300': log.done,
-                  'bg-green-900': !log.done,
-                }}
-              >
-                {/* Log Title */}
-                <h3 class="flex justify-between items-baseline mb-3">
-                  <div class="uppercase font-bold text-lg">
-                    Log {index() + 1}
-                  </div>
-                  <div
-                    class="uppercase font-bold badge badge-sm"
-                    classList={{
-                      'badge-success': log.done,
-                    }}
-                  >
-                    {log.done ? 'Done' : 'Ongoing'}
-                  </div>
-                </h3>
-
-                {/* Log Data */}
-                <div class="grid grid-cols-[1fr_3fr] items-baseline gap-x-3 gap-y-3">
-                  <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                    ID:
-                  </span>
-                  <span class="hyphens-auto break-all">{log.id}</span>
-                  <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                    Start:
-                  </span>
-                  <span>
-                    {new Date(log.startedAt).toLocaleString(undefined, {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                      weekday: 'short',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      second: 'numeric',
-                    })}
-                  </span>
-                  <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                    End:
-                  </span>
-                  <span>
-                    {new Date(log.endedAt).toLocaleString(undefined, {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                      weekday: 'short',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      second: 'numeric',
-                    })}
-                  </span>
-                  <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                    Duration:
-                  </span>
-                  <span>
-                    {formatTime((log.endedAt - log.startedAt) / 1000)}
-                  </span>
-                  <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                    Comment:
-                  </span>
-                  <span>{log.comment || 'None'}</span>
-                </div>
-
-                {/* Modals */}
-                <CommentLogModal
-                  comment={() => selectedLog()?.comment ?? ''}
-                  setComment={(comment) => {
-                    setUserState(
-                      'projectGroups',
-                      groupIndex,
-                      'projects',
-                      projectIndex,
-                      'logs',
-                      project.logs.indexOf(selectedLog()!),
-                      'comment',
-                      comment
-                    )
-                  }}
-                />
-
-                {/* Log Action Buttons */}
-                {log.done && (
-                  <div class="flex gap-3 justify-end mt-auto pt-5">
-                    <label
-                      class="btn btn-sm flex gap-1 items-center"
-                      for="comment-log-modal"
-                      onClick={() => setSelectedLog(log)}
-                    >
-                      <span class="i-carbon-edit"></span>
-                      <span>Comment</span>
-                    </label>
-                    <button
-                      class="btn btn-sm flex gap-1 items-center btn-ghost text-error"
-                      onClick={() => removeLog(log.id)}
-                    >
-                      <span class="i-carbon-delete"></span>
-                      <span>Delete</span>
-                    </button>
-                  </div>
+                {running() ? (
+                  <>
+                    <div class="i-carbon-pause-filled"></div>
+                    <span>Stop</span>
+                  </>
+                ) : (
+                  <>
+                    <div class="i-carbon-play-filled-alt"></div>
+                    <span>Start</span>
+                  </>
                 )}
-              </div>
-            )}
-          </For>
-        </div>
-      </Show>
-    </main>
+              </button>
+              <button class="btn btn-ghost btn-sm flex gap-1 items-center">
+                <div class="i-carbon-printer"></div>
+                <span>Print</span>
+              </button>
+              <ConfirmModal
+                id="delete-project-modal"
+                title="Delete Project"
+                message="Are you sure you would like to delete this project?"
+                onConfirm={removeProject}
+              >
+                <label
+                  for="delete-project-modal"
+                  class="btn btn-ghost text-error btn-sm flex gap-1 items-center"
+                >
+                  <div class="i-carbon-delete"></div>
+                  <span>Delete</span>
+                </label>
+              </ConfirmModal>
+            </div>
+          </div>
+
+          {/* Logs */}
+          <div class="py-5 grid grid-cols-[repeat(auto-fill,minmax(23rem,1fr))] gap-3">
+            <For each={[...project.logs].reverse()}>
+              {(log, index) => (
+                <div
+                  class="p-5 rounded"
+                  classList={{
+                    'bg-base-300': log.done,
+                    'bg-green-900': !log.done,
+                  }}
+                >
+                  {/* Log Title */}
+                  <h3 class="flex justify-between items-baseline mb-3">
+                    <div class="uppercase font-bold text-lg">
+                      Log {project.logs.length - index()}
+                    </div>
+                    <div
+                      class="uppercase font-bold badge badge-sm"
+                      classList={{
+                        'badge-success': log.done,
+                      }}
+                    >
+                      {log.done ? 'Done' : 'Ongoing'}
+                    </div>
+                  </h3>
+
+                  {/* Log Data */}
+                  <div class="grid grid-cols-[1fr_3fr] items-baseline gap-x-3 gap-y-3">
+                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
+                      ID:
+                    </span>
+                    <span class="hyphens-auto break-all">{log.id}</span>
+                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
+                      Start:
+                    </span>
+                    <span>
+                      {new Date(log.startedAt).toLocaleString(undefined, {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        weekday: 'short',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric',
+                      })}
+                    </span>
+                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
+                      End:
+                    </span>
+                    <span>
+                      {new Date(log.endedAt).toLocaleString(undefined, {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        weekday: 'short',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric',
+                      })}
+                    </span>
+                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
+                      Duration:
+                    </span>
+                    <span>
+                      {formatTime((log.endedAt - log.startedAt) / 1000)}
+                    </span>
+                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
+                      Comment:
+                    </span>
+                    <span>{log.comment || 'None'}</span>
+                  </div>
+
+                  {/* Modals */}
+                  <CommentLogModal
+                    comment={() => selectedLog()?.comment ?? ''}
+                    setComment={(comment) => {
+                      setUserState(
+                        'projectGroups',
+                        groupIndex,
+                        'projects',
+                        projectIndex,
+                        'logs',
+                        project.logs.indexOf(selectedLog()!),
+                        'comment',
+                        comment
+                      )
+                    }}
+                  />
+
+                  {/* Log Action Buttons */}
+                  {log.done && (
+                    <div class="flex gap-3 justify-end mt-auto pt-5">
+                      <label
+                        class="btn btn-sm flex gap-1 items-center"
+                        for="comment-log-modal"
+                        onClick={() => setSelectedLog(log)}
+                      >
+                        <span class="i-carbon-edit"></span>
+                        <span>Comment</span>
+                      </label>
+                      <button
+                        class="btn btn-sm flex gap-1 items-center btn-ghost text-error"
+                        onClick={() => removeLog(log.id)}
+                      >
+                        <span class="i-carbon-delete"></span>
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </For>
+          </div>
+        </Show>
+      </main>
+    </div>
   )
 }
 

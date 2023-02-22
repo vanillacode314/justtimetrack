@@ -1,4 +1,4 @@
-import { For, createSignal, Show, JSXElement } from 'solid-js'
+import { JSXElement } from 'solid-js'
 
 interface IItem<T = any> {
   title: string
@@ -10,12 +10,13 @@ interface Props<T> {
   children: (data: T) => JSXElement
 }
 
+const NONE = -1
 export const Accordion: <T>(props: Props<T>) => JSXElement = (props) => {
-  const [activeIndex, setActiveIndex] = createSignal<number>(-1) // -1 indicates no item active
+  const [activeIndex, setActiveIndex] = createSignal<number>(NONE)
 
   function activate(n: number) {
     if (activeIndex() === n) {
-      setActiveIndex(-1) // -1 indicates no item active
+      setActiveIndex(NONE)
       return
     }
     setActiveIndex(n)

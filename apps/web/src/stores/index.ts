@@ -1,6 +1,3 @@
-import { createComputed } from 'solid-js'
-import { createStore } from 'solid-js/store'
-import { isServer } from 'solid-js/web'
 import type { IProjectGroup } from '~/types'
 
 interface LocalStorageStoreOptions<T = any> {

@@ -1,7 +1,6 @@
 import { Component } from 'solid-js'
 import { toast } from '~/components/Toast'
 import ConfirmModal from '~/modals/ConfirmModal'
-import { useUserState } from '~/stores'
 
 export const SettingsPage: Component = () => {
   const [, , resetUserState] = useUserState()
