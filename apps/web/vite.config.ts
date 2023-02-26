@@ -41,7 +41,12 @@ export default defineConfig({
       ],
       dirs: ['./src/components/', './src/stores/', './src/utils/'],
     }),
-    solid({ ssr: false, adapter: vercel() }),
+    solid({
+      ssr: false,
+      adapter: vercel({
+        edge: false,
+      }),
+    }),
     Unocss({
       transformers: [transformerDirectives()],
       presets: [
