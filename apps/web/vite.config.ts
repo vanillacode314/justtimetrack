@@ -10,7 +10,7 @@ import {
   presetIcons,
   presetWebFonts,
 } from 'unocss'
-import presetDaisy from 'unocss-preset-daisy'
+import { presetDaisy } from 'unocss-preset-daisy'
 
 import vercel from 'solid-start-vercel'
 import node from 'solid-start-node'
@@ -50,8 +50,8 @@ export default defineConfig({
     Unocss({
       transformers: [transformerDirectives()],
       presets: [
-        presetUno(),
         presetDaisy(),
+        presetUno(),
         presetIcons({
           extraProperties: {
             display: 'inline-block',
@@ -61,7 +61,7 @@ export default defineConfig({
         presetWebFonts({
           extendTheme: true,
           fonts: {
-            sans: ['Barlow:400,500,600,700'],
+            sans: ['Inter:400,500,600,700,800,900'],
           },
         }),
       ],

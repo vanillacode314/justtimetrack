@@ -10,7 +10,6 @@ interface Props {
 export const BaseLayout: Component<Props> = (props) => {
   return (
     <>
-      <Navbar />
       <Drawer>{props.children}</Drawer>
       <Toast />
     </>

@@ -60,11 +60,14 @@ export const Drawer: Component<Props> = (props) => {
         checked={appState.drawerVisible}
         onChange={(e) => setAppState('drawerVisible', e.currentTarget.checked)}
       />
-      <div class="drawer-content">{props.children}</div>
-      <div class="drawer-side border-r-2 border-stone-900">
+      <div class="drawer-content bg-base-100">{props.children}</div>
+      <div class="drawer-side">
         <label for="main-drawer" class="drawer-overlay"></label>
-        <ul class="menu p-4 w-80 bg-base-100 text-base-content gap-2">
+        <ul class="menu p-4 w-80 bg-base-300 text-base-content gap-2">
           {/*  Sidebar content here */}
+          <span class="uppercase font-black text-2xl text-center p-3 tracking-wider">
+            JustTimeTrack
+          </span>
           {/* Links */}
           <For each={navLinks}>
             {({ label, url, icon, sublinks }) => (

@@ -1,7 +1,6 @@
-import { IProject, IProjectGroup } from '~/types'
-
 export default function HomePage() {
   const [userState, setUserState] = useUserState()
+  const [appState, setAppState] = useAppState()
 
   const runningProjects = () => {
     const retval = []
@@ -14,7 +13,7 @@ export default function HomePage() {
     return retval
   }
 
-  function pauseProject(group: IProjectGroup, project: IProject) {
+  function pauseProject(group: TProjectGroup, project: TProject) {
     setUserState(
       'projectGroups',
       ({ id }) => id === group.id,
@@ -95,6 +94,9 @@ export default function HomePage() {
                   <div class="text-center flex flex-col items-center gap-5 h-full p-5">
                     <p class="uppercase font-bold">Empty Group</p>
                     <label
+                      onClick={() => {
+                        setAppState('selectedProjectGroupId', groupId)
+                      }}
                       for="add-new-project-modal"
                       class="flex gap-1 items-center btn btn-primary"
                     >

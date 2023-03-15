@@ -1,57 +1,24 @@
-import type { IProjectGroup } from '~/types'
+import { projectGroupSchema } from '~/types'
+import { createStorageStore } from '~/utils/stores'
+import z from 'zod'
 
-interface LocalStorageStoreOptions<T = any> {
-  serializer: (input: T) => string
-  deserializer: (input: string) => T
-}
-const createLocalStorageStore = <T extends Record<string, any>>(
-  localStorageKey: string,
-  initialValue: T,
-  {
-    serializer = JSON.stringify,
-    deserializer = JSON.parse,
-  }: Partial<LocalStorageStoreOptions<T>> = {}
-) => {
-  const [store, set] = createStore<T>(initialValue)
-
-  function getLocalStorageValue() {
-    const localStorageValue = localStorage.getItem(localStorageKey)
-    localStorageValue
-      ? set(deserializer(localStorageValue))
-      : localStorage.setItem(localStorageKey, serializer(initialValue))
-  }
-
-  if (!isServer) {
-    getLocalStorageValue()
-    window.addEventListener('storage', () => getLocalStorageValue())
-  }
-
-  createComputed(
-    () => !isServer && localStorage.setItem(localStorageKey, serializer(store))
-  )
-
-  return [store, set] as const
-}
-
-export interface IAppState {
-  drawerVisible: boolean
-}
-
-export interface IUserState {
-  projectGroups: IProjectGroup[]
-}
-
-const [appState, setAppState] = createStore<IAppState>({
-  drawerVisible: false,
+const appStateSchema = z.object({
+  drawerVisible: z.boolean().default(false),
+  selectedProjectGroupId: z.string().default(''),
 })
+export type TAppState = z.infer<typeof appStateSchema>
+const [appState, setAppState] = createStore<TAppState>(appStateSchema.parse({}))
 
-export const GET_DEFAULT_USER_STATE: () => IUserState = () => ({
-  projectGroups: [],
+const userStateSchema = z.object({
+  projectGroups: projectGroupSchema.array().default([]),
 })
-
-const [userState, setUserState] = createLocalStorageStore<IUserState>(
+export type TUserState = z.infer<typeof userStateSchema>
+const [userState, setUserState] = createStorageStore(
   'user-state',
-  GET_DEFAULT_USER_STATE()
+  userStateSchema.parse({}),
+  {
+    schema: userStateSchema,
+  }
 )
 
 export const useAppState = () => [appState, setAppState] as const
@@ -59,5 +26,5 @@ export const useUserState = () =>
   [
     userState,
     setUserState,
-    () => setUserState(GET_DEFAULT_USER_STATE()),
+    () => setUserState(userStateSchema.parse({})),
   ] as const

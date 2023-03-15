@@ -9,6 +9,7 @@ export const AddNewProjectModal: Component = () => {
   let selectElement!: HTMLSelectElement
 
   const [userState, setUserState] = useUserState()
+  const [appState, setAppState] = useAppState()
 
   const [open, setOpen] = createSignal<boolean>(false)
 
@@ -20,10 +21,12 @@ export const AddNewProjectModal: Component = () => {
     currency: z.string().default('USD'),
   })
   const [formData, setFormData] = createStore<z.infer<typeof formSchema>>(
-    formSchema.parse({})
+    formSchema.parse({
+      group: appState.selec,
+    })
   )
 
-  const addNewGroup = () => {
+  function addNewGroup() {
     const groupName = prompt('Enter group name')
     if (groupName === null) {
       toast('Invalid group name', 'Group name must be alphanumeric', {
@@ -136,7 +139,15 @@ export const AddNewProjectModal: Component = () => {
   }
 
   createEffect(() => {
-    open() && selectElement.focus()
+    if (open()) {
+      setFormData({
+        group:
+          userState.projectGroups.find(
+            (group) => group.id === appState.selectedProjectGroupId
+          )?.name ?? 'null',
+      })
+      selectElement.focus()
+    }
   })
 
   return (
