@@ -1,3 +1,5 @@
+import { setAddNewProjectModalOpen } from '~/modals/AddNewProjectModal'
+
 export default function HomePage() {
   const [userState, setUserState] = useUserState()
   const [appState, setAppState] = useAppState()
@@ -93,16 +95,16 @@ export default function HomePage() {
                 fallback={
                   <div class="text-center flex flex-col items-center gap-5 h-full p-5">
                     <p class="uppercase font-bold">Empty Group</p>
-                    <label
+                    <button
                       onClick={() => {
+                        setAddNewProjectModalOpen(true)
                         setAppState('selectedProjectGroupId', groupId)
                       }}
-                      for="add-new-project-modal"
                       class="flex gap-1 items-center btn btn-primary"
                     >
                       <div class="i-carbon-add text-xl" />
                       <span>Add new project</span>
-                    </label>
+                    </button>
                   </div>
                 }
               >

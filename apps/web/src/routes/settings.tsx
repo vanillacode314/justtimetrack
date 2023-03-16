@@ -6,7 +6,7 @@ export const SettingsPage: Component = () => {
   const [, , resetUserState] = useUserState()
 
   return (
-    <section class="p-5 flex flex-col" aria-label="settings">
+    <section class="mx-auto max-w-xl p-5 flex flex-col" aria-label="settings">
       <ConfirmModal
         id="clear-data-modal"
         title="Clear Data"
@@ -16,9 +16,9 @@ export const SettingsPage: Component = () => {
           toast('Cleared Data Successfully', '', { type: 'success' })
         }}
       >
-        <label for="clear-data-modal" class="btn btn-error">
+        <button class="btn btn-error">
           Clear Data
-        </label>
+        </button>
       </ConfirmModal>
     </section>
   )

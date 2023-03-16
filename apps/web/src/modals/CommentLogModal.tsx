@@ -9,10 +9,11 @@ interface Props {
   setComment: (comment: string) => void
 }
 
+export const [commentLogModalOpen, setCommentLogModalOpen] =
+  createSignal<boolean>(false)
+
 export const CommentLogModal: Component<Props> = (props) => {
   let inputElement!: HTMLInputElement
-
-  const [open, setOpen] = createSignal<boolean>(false)
 
   const formSchema = z.object({
     comment: z.string(),
@@ -25,7 +26,7 @@ export const CommentLogModal: Component<Props> = (props) => {
   const [formData, setFormData] = createStore<formSchemaType>(getDefaultData())
 
   createEffect(() => {
-    if (open()) {
+    if (commentLogModalOpen()) {
       inputElement.focus()
 
       // select all
@@ -58,33 +59,36 @@ export const CommentLogModal: Component<Props> = (props) => {
       type: 'success',
     })
     setFormData(getDefaultData())
-    setOpen(false)
+    setCommentLogModalOpen(false)
   }
 
   return (
-    <BaseModal id="comment-log-modal">
-      <div class="modal-box rounded-xl">
-        <h3 class="font-bold text-lg">Comment Log</h3>
-        <form
-          class="py-5 flex flex-col gap-3"
-          method="dialog"
-          onSubmit={onSubmit}
-        >
-          <input
-            ref={inputElement}
-            type="text"
-            placeholder="Write your comment here"
-            class="input input-bordered w-full"
-            value={formData.comment}
-            onInput={(e) => setFormData('comment', e.currentTarget.value)}
-          />
-          <div class="modal-action">
-            <button class="btn uppercase flex gap-2 items-center btn-success">
-              <div class="text-lg i-carbon-edit"></div> Comment
-            </button>
-          </div>
-        </form>
-      </div>
+    <BaseModal
+      id="comment-log-modal"
+      open={commentLogModalOpen()}
+      onOpen={() => setCommentLogModalOpen(true)}
+      onClose={() => setCommentLogModalOpen(false)}
+    >
+      <h3 class="font-bold text-lg">Comment Log</h3>
+      <form
+        class="py-5 flex flex-col gap-3"
+        method="dialog"
+        onSubmit={onSubmit}
+      >
+        <input
+          ref={inputElement}
+          type="text"
+          placeholder="Write your comment here"
+          class="input input-bordered w-full"
+          value={formData.comment}
+          onInput={(e) => setFormData('comment', e.currentTarget.value)}
+        />
+        <div class="modal-action">
+          <button class="btn uppercase flex gap-2 items-center btn-success">
+            <div class="text-lg i-carbon-edit"></div> Comment
+          </button>
+        </div>
+      </form>
     </BaseModal>
   )
 }

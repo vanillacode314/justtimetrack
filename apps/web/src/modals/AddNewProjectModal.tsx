@@ -1,17 +1,17 @@
 import { Component } from 'solid-js'
 import { z, ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
-import { IProject } from '~/types'
 import { toast } from '~/components/Toast'
 import BaseModal from './BaseModal'
+
+export const [addNewProjectModalOpen, setAddNewProjectModalOpen] =
+  createSignal<boolean>(false)
 
 export const AddNewProjectModal: Component = () => {
   let selectElement!: HTMLSelectElement
 
   const [userState, setUserState] = useUserState()
-  const [appState, setAppState] = useAppState()
-
-  const [open, setOpen] = createSignal<boolean>(false)
+  const [appState, _setAppState] = useAppState()
 
   const formSchema = z.object({
     group: z.string().min(3).default('null'),
@@ -21,9 +21,7 @@ export const AddNewProjectModal: Component = () => {
     currency: z.string().default('USD'),
   })
   const [formData, setFormData] = createStore<z.infer<typeof formSchema>>(
-    formSchema.parse({
-      group: appState.selec,
-    })
+    formSchema.parse({})
   )
 
   function addNewGroup() {
@@ -45,8 +43,8 @@ export const AddNewProjectModal: Component = () => {
       return
     }
 
-    setUserState('projectGroups', (_) => [
-      ..._,
+    setUserState('projectGroups', ($projectGroups) => [
+      ...$projectGroups,
       {
         id: groupName.toLowerCase().replaceAll(' ', '-'),
         name: groupName,
@@ -125,7 +123,7 @@ export const AddNewProjectModal: Component = () => {
             description: '',
             logs: [],
             paid: false,
-          }) as IProject
+          }) as TProject
     )
     toast(
       'Successfully added new project',
@@ -135,11 +133,12 @@ export const AddNewProjectModal: Component = () => {
       }
     )
     setFormData(formSchema.parse({}))
-    setOpen(false)
+    setAddNewProjectModalOpen(false)
   }
 
-  createEffect(() => {
-    if (open()) {
+  createEffect(
+    on(addNewProjectModalOpen, (open) => {
+      if (!open) return
       setFormData({
         group:
           userState.projectGroups.find(
@@ -147,89 +146,85 @@ export const AddNewProjectModal: Component = () => {
           )?.name ?? 'null',
       })
       selectElement.focus()
-    }
-  })
+    })
+  )
 
   return (
     <BaseModal
       id="add-new-project-modal"
-      open={open()}
-      onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
+      open={addNewProjectModalOpen()}
+      onOpen={() => setAddNewProjectModalOpen(true)}
+      onClose={() => setAddNewProjectModalOpen(false)}
     >
-      <div class="modal-box rounded-xl text-white">
-        <h3 class="font-bold text-lg">Add New Project</h3>
-        <form
-          class="py-5 flex flex-col gap-3"
-          method="dialog"
-          onSubmit={onSubmit}
-        >
-          <span class="grid grid-cols-[1fr_auto] gap-3">
-            <select
-              ref={selectElement}
-              value={formData.group}
-              onChange={(e) => setFormData('group', e.currentTarget.value)}
-              class="select select-bordered w-full"
-            >
-              <option value="null" disabled>
-                Select project group
-              </option>
-              <For each={userState.projectGroups}>
-                {({ name }) => <option>{name}</option>}
-              </For>
-            </select>
-            <button type="button" class="btn" onClick={() => addNewGroup()}>
-              New Group
-            </button>
-          </span>
+      <h3 class="font-bold text-lg">Add New Project</h3>
+      <form
+        class="py-5 flex flex-col gap-3"
+        method="dialog"
+        onSubmit={onSubmit}
+      >
+        <span class="grid grid-cols-[1fr_auto] gap-3">
+          <select
+            ref={selectElement}
+            value={formData.group}
+            onChange={(e) => setFormData('group', e.currentTarget.value)}
+            class="select select-bordered w-full"
+          >
+            <option value="null" disabled>
+              Select project group
+            </option>
+            <For each={userState.projectGroups}>
+              {({ name }) => <option>{name}</option>}
+            </For>
+          </select>
+          <button type="button" class="btn" onClick={() => addNewGroup()}>
+            New Group
+          </button>
+        </span>
+        <input
+          type="text"
+          placeholder="Project Name"
+          class="input input-bordered w-full"
+          value={formData.name === 'null' ? '' : formData.name}
+          onInput={(e) =>
+            setFormData(
+              'name',
+              e.currentTarget.value === '' ? 'null' : e.currentTarget.value
+            )
+          }
+        />
+        <label class="label cursor-pointer">
+          <span class="label-text">Paid</span>
           <input
-            type="text"
-            placeholder="Project Name"
-            class="input input-bordered w-full"
-            value={formData.name === 'null' ? '' : formData.name}
-            onInput={(e) =>
-              setFormData(
-                'name',
-                e.currentTarget.value === '' ? 'null' : e.currentTarget.value
-              )
-            }
+            type="checkbox"
+            class="toggle"
+            checked={formData.paid}
+            onChange={(e) => setFormData('paid', e.currentTarget.checked)}
           />
-          <label class="label cursor-pointer">
-            <span class="label-text">Paid</span>
+        </label>
+        <Show when={formData.paid}>
+          <>
             <input
-              type="checkbox"
-              class="toggle"
-              checked={formData.paid}
-              onChange={(e) => setFormData('paid', e.currentTarget.checked)}
+              type="number"
+              placeholder="Hourly Rate"
+              class="input input-bordered w-full"
+              value={formData.hourlyRate}
+              onInput={(e) => setFormData('hourlyRate', +e.currentTarget.value)}
             />
-          </label>
-          <Show when={formData.paid}>
-            <>
-              <input
-                type="number"
-                placeholder="Hourly Rate"
-                class="input input-bordered w-full"
-                value={formData.hourlyRate}
-                onInput={(e) =>
-                  setFormData('hourlyRate', +e.currentTarget.value)
-                }
-              />
-              <input
-                type="text"
-                placeholder="Currency"
-                class="input input-bordered w-full"
-                value={formData.currency}
-                onInput={(e) => setFormData('currency', e.currentTarget.value)}
-              />
-            </>
-          </Show>
-          <div class="modal-action">
-            <button class="btn btn-primary uppercase flex gap-2 items-center">
-              <div class="text-lg i-mdi-plus"></div> Add
-            </button>
-          </div>
-        </form>
-      </div>
+            <input
+              type="text"
+              placeholder="Currency"
+              class="input input-bordered w-full"
+              value={formData.currency}
+              onInput={(e) => setFormData('currency', e.currentTarget.value)}
+            />
+          </>
+        </Show>
+        <div class="modal-action">
+          <button class="btn btn-primary uppercase flex gap-2 items-center">
+            <div class="text-lg i-mdi-plus"></div> Add
+          </button>
+        </div>
+      </form>
     </BaseModal>
   )
 }

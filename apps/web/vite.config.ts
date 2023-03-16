@@ -4,13 +4,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import solid from 'solid-start/vite'
 
 import Unocss from 'unocss/vite'
-import {
-  transformerDirectives,
-  presetUno,
-  presetIcons,
-  presetWebFonts,
-} from 'unocss'
-import { presetDaisy } from 'unocss-preset-daisy'
+import { transformerDirectives, presetIcons, presetWebFonts } from 'unocss'
 
 import vercel from 'solid-start-vercel'
 import node from 'solid-start-node'
@@ -50,8 +44,6 @@ export default defineConfig({
     Unocss({
       transformers: [transformerDirectives()],
       presets: [
-        presetDaisy(),
-        presetUno(),
         presetIcons({
           extraProperties: {
             display: 'inline-block',

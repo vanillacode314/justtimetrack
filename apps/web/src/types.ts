@@ -1,12 +1,21 @@
 import z from 'zod'
 
-export const activityLogSchema = z.object({
-  id: z.string(),
-  startedAt: z.number().default(() => Date.now()),
-  endedAt: z.number().optional(),
-  done: z.boolean().default(false),
-  comment: z.string().default(''),
-})
+export const activityLogSchema = z.discriminatedUnion('done', [
+  z.object({
+    id: z.string(),
+    startedAt: z.number().default(() => Date.now()),
+    endedAt: z.number(),
+    done: z.literal(true),
+    comment: z.string().default(''),
+  }),
+  z.object({
+    id: z.string(),
+    startedAt: z.number().default(() => Date.now()),
+    endedAt: z.undefined(),
+    done: z.literal(false),
+    comment: z.string().default(''),
+  }),
+])
 
 export const projectSchema = z.discriminatedUnion('paid', [
   z.object({

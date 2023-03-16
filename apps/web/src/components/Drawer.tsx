@@ -1,5 +1,6 @@
 import { Component, JSXElement } from 'solid-js'
 import { A } from 'solid-start'
+import { setAddNewProjectModalOpen } from '~/modals/AddNewProjectModal'
 
 interface Props {
   children: JSXElement
@@ -14,16 +15,11 @@ type ILink = {
     Omit<ILink, 'modal' | 'url' | 'sublinks'> &
       Xor<
         {
-          modal: string
+          action: () => void
         },
-        Xor<
-          {
-            action: () => void
-          },
-          {
-            url: string
-          }
-        >
+        {
+          url: string
+        }
       >
   >
 }
@@ -37,7 +33,7 @@ const navLinks: ILink[] = [
       {
         label: 'Add New',
         icon: 'i-mdi-plus',
-        modal: 'add-new-project-modal',
+        action: () => setAddNewProjectModalOpen(true),
       },
     ],
   },
@@ -72,39 +68,41 @@ export const Drawer: Component<Props> = (props) => {
           <For each={navLinks}>
             {({ label, url, icon, sublinks }) => (
               <>
-                <li class="text-sm">
+                <li>
                   {url ? (
-                    <A href={url} end={true}>
+                    <A
+                      href={url}
+                      end={true}
+                      class="text-xs font-bold uppercase tracking-wide"
+                    >
                       {icon && <div class={icon}></div>}
                       {label}
                     </A>
                   ) : (
-                    <div>
+                    <div class="text-xs font-bold uppercase tracking-wide">
                       {icon && <div class={icon}></div>}
                       {label}
                     </div>
                   )}
                 </li>
                 <For each={sublinks}>
-                  {({ label, modal, action, url, icon }) => (
-                    <li class="text-sm">
-                      {modal ? (
-                        <label
-                          for={modal}
-                          onClick={() => setAppState('drawerVisible', false)}
+                  {({ label, action, url, icon }) => (
+                    <li>
+                      {url ? (
+                        <A
+                          href={url}
+                          end={true}
+                          class="text-xs font-bold uppercase tracking-wide"
                         >
-                          &nbsp;
-                          {icon && <div class={icon}></div>}
-                          {label}
-                        </label>
-                      ) : url ? (
-                        <A href={url} end={true}>
                           &nbsp;
                           {icon && <div class={icon}></div>}
                           {label}
                         </A>
                       ) : (
-                        <button onClick={action}>
+                        <button
+                          onClick={action}
+                          class="text-xs font-bold uppercase tracking-wide"
+                        >
                           &nbsp;
                           {icon && <div class={icon}></div>}
                           {label}

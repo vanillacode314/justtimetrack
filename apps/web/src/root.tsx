@@ -13,6 +13,7 @@ import {
   Scripts,
   Title,
 } from 'solid-start'
+import './root.css'
 
 import Base from '~/layouts/Base'
 import { AddNewProjectModal } from '~/modals/AddNewProjectModal'

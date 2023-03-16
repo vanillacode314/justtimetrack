@@ -1,8 +1,7 @@
 import { Component } from 'solid-js'
 import { A } from 'solid-start'
-import { CommentLogModal } from '~/modals/CommentLogModal'
+import { CommentLogModal, setCommentLogModalOpen } from '~/modals/CommentLogModal'
 import ConfirmModal from '~/modals/ConfirmModal'
-import { IActivityLog, IProject } from '~/types'
 
 export const ProjectPage: Component = () => {
   const [userState, setUserState] = useUserState()
@@ -10,7 +9,7 @@ export const ProjectPage: Component = () => {
   const params = useParams()
   const navigate = useNavigate()
 
-  const [selectedLog, setSelectedLog] = createSignal<IActivityLog>()
+  const [selectedLog, setSelectedLog] = createSignal<TActivityLog>()
 
   const [error, setError] = createSignal<string>('')
 
@@ -22,7 +21,7 @@ export const ProjectPage: Component = () => {
   if (groupIndex === -1) setError(`group with id ${params.group} not found`)
 
   // find project
-  let project!: IProject
+  let project!: TProject
   let projectIndex: number
 
   if (group) {
@@ -42,15 +41,18 @@ export const ProjectPage: Component = () => {
 
   // utils
   const totalLoggedTime = () =>
-    project.logs.reduce((sum, log) => sum + (log.endedAt - log.startedAt), 0) /
-    1000
+    project.logs.reduce(
+      (sum, log) =>
+        sum + (log.done ? log.endedAt ?? Date.now() - log.startedAt : 0),
+      0
+    ) / 1000
 
   const formatTime = (inputSeconds: number) => {
     const { hours, minutes, seconds } = formatSeconds(inputSeconds)
     return `${hours}h ${minutes}m ${seconds}s`
   }
 
-  const removeLog = (id: IActivityLog['id']) =>
+  const removeLog = (id: TActivityLog['id']) =>
     setUserState(
       'projectGroups',
       groupIndex,
@@ -183,7 +185,7 @@ export const ProjectPage: Component = () => {
                   <span class="text-3xl flex gap-1">
                     <span class="font-semibold">
                       {round(
-                        (totalLoggedTime() / 3600) * project.hourlyRate!,
+                        (totalLoggedTime() / 3600) * project.hourlyRate,
                         2
                       )}{' '}
                     </span>
@@ -304,34 +306,19 @@ export const ProjectPage: Component = () => {
                     <span>{log.comment || 'None'}</span>
                   </div>
 
-                  {/* Modals */}
-                  <CommentLogModal
-                    comment={() => selectedLog()?.comment ?? ''}
-                    setComment={(comment) => {
-                      setUserState(
-                        'projectGroups',
-                        groupIndex,
-                        'projects',
-                        projectIndex,
-                        'logs',
-                        project.logs.indexOf(selectedLog()!),
-                        'comment',
-                        comment
-                      )
-                    }}
-                  />
-
                   {/* Log Action Buttons */}
                   {log.done && (
                     <div class="flex gap-3 justify-end mt-auto pt-5">
-                      <label
+                      <button
                         class="btn btn-sm flex gap-1 items-center"
-                        for="comment-log-modal"
-                        onClick={() => setSelectedLog(log)}
+                        onClick={() => {
+                          setSelectedLog(log)
+                          setCommentLogModalOpen(true)
+                        }}
                       >
                         <span class="i-carbon-edit"></span>
                         <span>Comment</span>
-                      </label>
+                      </button>
                       <button
                         class="btn btn-sm flex gap-1 items-center btn-ghost text-error"
                         onClick={() => removeLog(log.id)}
@@ -344,6 +331,22 @@ export const ProjectPage: Component = () => {
                 </div>
               )}
             </For>
+            {/* Modals */}
+            <CommentLogModal
+              comment={() => selectedLog()?.comment ?? ''}
+              setComment={(comment) => {
+                setUserState(
+                  'projectGroups',
+                  groupIndex,
+                  'projects',
+                  projectIndex,
+                  'logs',
+                  project.logs.indexOf(selectedLog()!),
+                  'comment',
+                  comment
+                )
+              }}
+            />
           </div>
         </Show>
       </main>
