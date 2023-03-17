@@ -1,27 +1,24 @@
 import { Component } from 'solid-js'
 import { Button, Input } from 'ui'
+import z from 'zod'
 import BaseModal from './BaseModal'
 
-interface Options {
-  title?: string
-  icon?: string
-  initialValue?: string
-  message: string
-}
-
-const [state, setState] = createStore<
-  Options & { open: boolean; input: string }
->({
-  title: '',
-  icon: '',
-  initialValue: '',
-  message: '',
-  input: '',
-  open: false,
+const stateSchema = z.object({
+  title: z.string().default(''),
+  icon: z.string().default(''),
+  initialValue: z.string().default(''),
+  message: z.string().default(''),
+  value: z.string().default(''),
+  open: z.boolean().default(false),
 })
+type TOptions = z.infer<typeof stateSchema>
+
+const [state, setState] = createStore<TOptions>(stateSchema.parse({}))
 let resolve: ((value: string | undefined) => void) | undefined
 
-export async function prompt(opts: Options): Promise<string | undefined> {
+export async function prompt(
+  opts: Omit<TOptions, 'value' | 'open'>
+): Promise<string | undefined> {
   setState({ ...opts, open: true })
   console.log(state.open)
   return new Promise<string | undefined>((res) => (resolve = res))
@@ -52,7 +49,8 @@ export const PromptModal: Component<PromptModalProps> = (props) => {
         class="flex flex-col gap-5"
         onSubmit={() => {
           if (!resolve) return
-          resolve(state.input)
+          setState(stateSchema.parse({}))
+          resolve(state.value)
           resolve = undefined
         }}
       >
@@ -67,9 +65,9 @@ export const PromptModal: Component<PromptModalProps> = (props) => {
         <Input
           id="prompt"
           label={state.message}
-          value={state.input}
+          value={state.value}
           ref={inputElement}
-          onInput={(e) => setState('input', e.currentTarget.value)}
+          onInput={(e) => setState('value', e.currentTarget.value)}
         />
         <div class="modal-action">
           <Button type="submit" class="btn-primary" icon="i-mdi-check">
