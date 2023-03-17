@@ -14,17 +14,17 @@ export const BaseModal: Component<Props> = (props) => {
   const { onOpen, onClose } = props
   const open = () => props.open
   const [mouseDown, setMouseDown] = createSignal<boolean>(false)
-  const [openedOnce, setOpenedOnce] = createSignal<boolean>(false)
 
   createEffect(
     on(open, (open) => {
-      if (openedOnce()) {
-        open ? onOpen?.() : onClose?.()
+      if (open) {
+        dialogElement.showModal()
+        queueMicrotask(() => fadeIn(dialogElement))
+        onOpen?.()
       } else {
-        setOpenedOnce(open)
+        dialogElement.close()
+        onClose?.()
       }
-      open && queueMicrotask(() => fadeIn(dialogElement))
-      open ? dialogElement.showModal() : dialogElement.close()
     })
   )
 

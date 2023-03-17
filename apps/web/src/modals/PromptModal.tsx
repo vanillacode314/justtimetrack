@@ -17,10 +17,9 @@ const [state, setState] = createStore<TOptions>(stateSchema.parse({}))
 let resolve: ((value: string | undefined) => void) | undefined
 
 export async function prompt(
-  opts: Omit<TOptions, 'value' | 'open'>
+  opts: Omit<z.input<typeof stateSchema>, 'value' | 'open'>
 ): Promise<string | undefined> {
-  setState({ ...opts, open: true })
-  console.log(state.open)
+  setState({ ...opts, open: true, value: opts.initialValue })
   return new Promise<string | undefined>((res) => (resolve = res))
 }
 
@@ -33,12 +32,10 @@ export const PromptModal: Component<PromptModalProps> = (props) => {
       open={state.open}
       onOpen={() => {
         setState('open', true)
-        queueMicrotask(() =>
-          inputElement.setSelectionRange(0, inputElement.value.length)
-        )
+        inputElement.setSelectionRange(0, inputElement.value.length)
       }}
       onClose={() => {
-        setState('open', false)
+        setState(stateSchema.parse({}))
         if (!resolve) return
         resolve(undefined)
         resolve = undefined
@@ -49,7 +46,6 @@ export const PromptModal: Component<PromptModalProps> = (props) => {
         class="flex flex-col gap-5"
         onSubmit={() => {
           if (!resolve) return
-          setState(stateSchema.parse({}))
           resolve(state.value)
           resolve = undefined
         }}

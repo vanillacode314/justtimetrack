@@ -6,6 +6,7 @@ import {
   setCommentLogModalOpen,
 } from '~/modals/CommentLogModal'
 import ConfirmModal from '~/modals/ConfirmModal'
+import { prompt } from '~/modals/PromptModal'
 
 export const ProjectPage: Component = () => {
   const [userState, setUserState] = useUserState()
@@ -328,9 +329,23 @@ export const ProjectPage: Component = () => {
                       <Button
                         class="btn-sm btn-primary"
                         icon="i-mdi-pencil"
-                        onClick={() => {
-                          setSelectedLog(log)
-                          setCommentLogModalOpen(true)
+                        onClick={async () => {
+                          const comment = await prompt({
+                            title: 'Comment',
+                            message: 'Enter a comment',
+                            initialValue: log.comment,
+                          })
+                          if (!comment) return
+                          setUserState(
+                            'projectGroups',
+                            groupIndex,
+                            'projects',
+                            projectIndex,
+                            'logs',
+                            project.logs.indexOf(log),
+                            'comment',
+                            comment
+                          )
                         }}
                       >
                         Comment
@@ -347,22 +362,6 @@ export const ProjectPage: Component = () => {
                 </article>
               )}
             </For>
-            {/* Modals */}
-            <CommentLogModal
-              comment={() => selectedLog()?.comment ?? ''}
-              setComment={(comment) => {
-                setUserState(
-                  'projectGroups',
-                  groupIndex,
-                  'projects',
-                  projectIndex,
-                  'logs',
-                  project.logs.indexOf(selectedLog()!),
-                  'comment',
-                  comment
-                )
-              }}
-            />
           </div>
         </Show>
       </main>
