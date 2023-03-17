@@ -1,6 +1,4 @@
-import { createComputed } from 'solid-js'
-import { type Store, createStore } from 'solid-js/store'
-import { isServer } from 'solid-js/web'
+import type { Store } from 'solid-js/store'
 import z from 'zod'
 
 export async function getNextValue<T>(
@@ -15,7 +13,7 @@ export async function getNextValue<T>(
       let key = getKey(store)
       createRoot((dispose) => {
         _dispose = dispose
-        createEffect(() => {
+        createComputed(() => {
           if (key === getKey(store)) return
           dispose()
           resolve(store)
@@ -25,7 +23,7 @@ export async function getNextValue<T>(
     } else {
       createRoot((dispose) => {
         _dispose = dispose
-        createEffect(() => {
+        createComputed(() => {
           if (firstRun) {
             firstRun = false
             return

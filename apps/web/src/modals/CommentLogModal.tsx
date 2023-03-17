@@ -64,7 +64,6 @@ export const CommentLogModal: Component<Props> = (props) => {
 
   return (
     <BaseModal
-      id="comment-log-modal"
       open={commentLogModalOpen()}
       onOpen={() => setCommentLogModalOpen(true)}
       onClose={() => setCommentLogModalOpen(false)}

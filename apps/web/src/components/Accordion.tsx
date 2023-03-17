@@ -8,11 +8,17 @@ interface IItem<T = any> {
 interface Props<T> {
   items: IItem<T>[]
   children: (data: T) => JSXElement
+  activeIndex?: number
+  onChange?: (item: T | undefined) => void
 }
 
 const NONE = -1
 export const Accordion: <T>(props: Props<T>) => JSXElement = (props) => {
-  const [activeIndex, setActiveIndex] = createSignal<number>(NONE)
+  const { onChange } = props
+
+  const [activeIndex, setActiveIndex] = createSignal<number>(
+    props.activeIndex ?? NONE
+  )
 
   function activate(n: number) {
     if (activeIndex() === n) {
@@ -21,6 +27,12 @@ export const Accordion: <T>(props: Props<T>) => JSXElement = (props) => {
     }
     setActiveIndex(n)
   }
+
+  createEffect(
+    on(activeIndex, (index) =>
+      onChange?.(index > -1 ? props.items[index].data : undefined)
+    )
+  )
 
   return (
     <div class="flex flex-col gap-5">

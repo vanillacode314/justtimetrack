@@ -1,60 +1,95 @@
 import { Component, JSXElement } from 'solid-js'
+import { Button } from 'ui'
 import BaseModal from './BaseModal'
 
+type ProcessConfirm = <T>(
+  callback: () => Promise<T>,
+  label?: string
+) => Promise<T>
+
 interface Props {
-  id: string
   title: string
   message: string
-  onConfirm: () => void
+  icon?: string
+  processingLabel?: string
+  onConfirm: (processConfirm: ProcessConfirm) => void
   onCancel?: () => void
-  children: JSXElement
+  children?: ((open: () => void) => JSXElement) | JSXElement
 }
 
 export const ConfirmModal: Component<Props> = (props) => {
+  const [processing, setProcessing] = createSignal<string>('')
   const { onConfirm, onCancel } = props
   const [open, setOpen] = createSignal<boolean>(false)
+
+  const processConfirm: ProcessConfirm = (
+    callback,
+    label = 'Working on it'
+  ) => {
+    setProcessing(label)
+    return callback()
+      .then((val) => {
+        setOpen(true)
+        return val
+      })
+      .finally(() => setProcessing(''))
+  }
 
   return (
     <>
       <BaseModal
-        id={props.id}
-        onClose={() => setOpen(false)}
-        onOpen={() => setOpen(true)}
         open={open()}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
       >
-        <h3 class="font-bold text-lg">{props.title}</h3>
-        <p>{props.message}</p>
-        <div class="flex gap-3 justify-end mt-5">
-          <button
-            class="btn btn-ghost text-success flex gap-3 items-center"
-            onClick={() => {
-              setOpen(false)
-              onConfirm()
-            }}
-          >
-            <div class="i-carbon-checkmark-filled"></div>
-            <span>OK</span>
-          </button>
-          <button
-            class="btn"
-            onClick={() => {
-              setOpen(false)
-              onCancel?.()
-            }}
-          >
-            <span>Cancel</span>
-          </button>
-        </div>
+        <form
+          method="dialog"
+          class="flex flex-col gap-5"
+          onSubmit={() => onConfirm(processConfirm)}
+        >
+          <h3 class="font-bold text-xl flex gap-5 items-center">
+            <Show when={props.icon}>
+              <span class={`${props.icon} text-2xl text-stone-400`} />
+            </Show>
+            <span>{props.title}</span>
+          </h3>
+          <p class="text-left">{props.message}</p>
+          <div class="modal-action">
+            <Button
+              type="submit"
+              class="btn-primary"
+              processing={!!processing()}
+              processingLabel={props.processingLabel}
+              icon="i-mdi-check"
+            >
+              Confirm
+            </Button>
+            <Button
+              type="button"
+              onclick={() => {
+                setOpen(false)
+                onCancel?.()
+              }}
+              class="btn-ghost"
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
       </BaseModal>
-      <form
-        class="contents"
-        onSubmit={(e) => {
-          e.preventDefault()
-          setOpen(true)
-        }}
-      >
-        {props.children}
-      </form>
+      <Show when={props.children}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            setOpen(true)
+          }}
+          class="contents"
+        >
+          {typeof props.children === 'function'
+            ? props.children!(() => setOpen(true))
+            : props.children}
+        </form>
+      </Show>
     </>
   )
 }

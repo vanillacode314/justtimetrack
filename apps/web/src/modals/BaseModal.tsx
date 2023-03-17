@@ -2,7 +2,6 @@ import { Component, JSXElement } from 'solid-js'
 import { fadeIn } from '~/utils/animations'
 
 interface Props {
-  id: string
   open: boolean
   onOpen?: () => void
   onClose?: () => void

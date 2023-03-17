@@ -11,6 +11,7 @@ const [appState, setAppState] = createStore<TAppState>(appStateSchema.parse({}))
 
 const userStateSchema = z.object({
   projectGroups: projectGroupSchema.array().default([]),
+  lastActiveGroup: projectGroupSchema.shape.id.default(''),
 })
 export type TUserState = z.infer<typeof userStateSchema>
 const [userState, setUserState] = createStorageStore(

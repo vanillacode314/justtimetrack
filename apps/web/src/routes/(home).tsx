@@ -1,4 +1,6 @@
+import { Button } from 'ui'
 import { setAddNewProjectModalOpen } from '~/modals/AddNewProjectModal'
+import ConfirmModal from '~/modals/ConfirmModal'
 
 export default function HomePage() {
   const [userState, setUserState] = useUserState()
@@ -36,14 +38,14 @@ export default function HomePage() {
         when={userState.projectGroups.length > 0}
         fallback={
           <div class="text-center grid justify-items-center place-content-center gap-5 h-full">
-            <p class="uppercase font-bold text-4xl">You have no projects yet</p>
-            <label
-              for="add-new-project-modal"
-              class="flex gap-1 items-center btn btn-primary"
+            <p class="uppercase font-bold text-4xl">No projects yet</p>
+            <Button
+              onClick={() => setAddNewProjectModalOpen(true)}
+              icon="i-carbon-add"
+              class="btn-primary"
             >
-              <div class="i-carbon-add text-xl" />
-              <span>Add new project</span>
-            </label>
+              Add new project
+            </Button>
           </div>
         }
       >
@@ -84,6 +86,10 @@ export default function HomePage() {
             All Projects
           </h2>
           <Accordion
+            onChange={(item) => setUserState('lastActiveGroup', item?.id ?? '')}
+            activeIndex={userState.projectGroups.findIndex(
+              (group) => group.id === userState.lastActiveGroup
+            )}
             items={userState.projectGroups.map((group) => ({
               title: group.name,
               data: group,
@@ -95,16 +101,39 @@ export default function HomePage() {
                 fallback={
                   <div class="text-center flex flex-col items-center gap-5 h-full p-5">
                     <p class="uppercase font-bold">Empty Group</p>
-                    <button
+                    <Button
                       onClick={() => {
-                        setAddNewProjectModalOpen(true)
                         setAppState('selectedProjectGroupId', groupId)
+                        setAddNewProjectModalOpen(true)
                       }}
-                      class="flex gap-1 items-center btn btn-primary"
+                      icon="i-carbon-add"
+                      class="btn-primary"
                     >
-                      <div class="i-carbon-add text-xl" />
-                      <span>Add new project</span>
-                    </button>
+                      Add new project
+                    </Button>
+                    <p class="uppercase font-bold">OR</p>
+                    <ConfirmModal
+                      title="Delete Group"
+                      message="Are you sure you want to delete this group?"
+                      icon="i-mdi-warning"
+                      onConfirm={() => {
+                        batch(() => {
+                          setAppState('selectedProjectGroupId', '')
+                          userState.lastActiveGroup === groupId &&
+                            setUserState('lastActiveGroup', '')
+                          setUserState(
+                            'projectGroups',
+                            userState.projectGroups.filter(
+                              (group) => group.id !== groupId
+                            )
+                          )
+                        })
+                      }}
+                    >
+                      <Button icon="i-mdi-trash" class="btn-error">
+                        Delete Group
+                      </Button>
+                    </ConfirmModal>
                   </div>
                 }
               >

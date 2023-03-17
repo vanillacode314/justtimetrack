@@ -1,6 +1,10 @@
 import { Component } from 'solid-js'
 import { A } from 'solid-start'
-import { CommentLogModal, setCommentLogModalOpen } from '~/modals/CommentLogModal'
+import { Button } from 'ui'
+import {
+  CommentLogModal,
+  setCommentLogModalOpen,
+} from '~/modals/CommentLogModal'
 import ConfirmModal from '~/modals/ConfirmModal'
 
 export const ProjectPage: Component = () => {
@@ -41,11 +45,8 @@ export const ProjectPage: Component = () => {
 
   // utils
   const totalLoggedTime = () =>
-    project.logs.reduce(
-      (sum, log) =>
-        sum + (log.done ? log.endedAt ?? Date.now() - log.startedAt : 0),
-      0
-    ) / 1000
+    project.logs.reduce((sum, log) => sum + log.endedAt - log.startedAt, 0) /
+    1000
 
   const formatTime = (inputSeconds: number) => {
     const { hours, minutes, seconds } = formatSeconds(inputSeconds)
@@ -144,7 +145,7 @@ export const ProjectPage: Component = () => {
           fallback={<div class="alert alert-error">{error}</div>}
         >
           <div class="bg-green-900 p-5 rounded-xl flex flex-col gap-3">
-            <h2 class="flex justify-between uppercase font-bold items-baseline">
+            <h2 class="flex text-xl justify-between font-bold items-baseline">
               {/* Project Details */}
               <span>{project.name}</span>
               <div
@@ -157,91 +158,98 @@ export const ProjectPage: Component = () => {
               </div>
             </h2>
             <p>{project.description}</p>
-            <div class="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] justify-between gap-3">
-              <span class="flex flex-col px-5 py-3 border-l-3 border-amber-500">
-                <span class="tracking-wider text-xs uppercase font-semibold">
-                  Total Logged Time
-                </span>
-                <span class="text-3xl flex gap-1">
-                  <span class="font-semibold">
-                    {formatTime(totalLoggedTime())}
-                  </span>
-                </span>
-              </span>
-              <Show when={project.paid}>
-                <span class="flex flex-col px-5 py-3 border-l-3 border-amber-500">
-                  <span class="tracking-wider text-xs uppercase font-semibold">
-                    Hourly Rate
-                  </span>
-                  <span class="text-3xl flex gap-1">
-                    <span class="font-semibold">{project.hourlyRate}</span>
-                    {project.currency}/hr
-                  </span>
-                </span>
-                <span class="flex flex-col px-5 py-3 border-l-3 border-amber-500">
-                  <span class="tracking-wider text-xs uppercase font-semibold">
-                    Total Earnings
-                  </span>
-                  <span class="text-3xl flex gap-1">
-                    <span class="font-semibold">
-                      {round(
-                        (totalLoggedTime() / 3600) * project.hourlyRate,
-                        2
-                      )}{' '}
-                    </span>
-                    <span>{project.currency}</span>
-                  </span>
-                </span>
-              </Show>
+            <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+              <For
+                each={[
+                  {
+                    title: 'Total Logged Time',
+                    content: () => (
+                      <span class="font-bold">
+                        {formatTime(totalLoggedTime())}
+                      </span>
+                    ),
+                  },
+                  {
+                    title: 'Hourly Rate',
+                    condition: () => project.paid,
+                    content: () => (
+                      <>
+                        <span class="font-bold">{project.hourlyRate}</span>
+                        {project.currency}/hr
+                      </>
+                    ),
+                  },
+                  {
+                    title: 'Total Earnings',
+                    condition: () => project.paid,
+                    content: () => (
+                      <>
+                        <span class="font-boldsemiboli">
+                          {round(
+                            (totalLoggedTime() / 3600) * project.hourlyRate,
+                            2
+                          )}{' '}
+                        </span>
+                        <span>{project.currency}</span>
+                      </>
+                    ),
+                  },
+                ]}
+              >
+                {({ title, content, condition }) => (
+                  <Show when={condition?.() ?? true}>
+                    <article class="flex flex-col p-5 gap-1 bg-black/10 rounded-xl w-full">
+                      <span class="font-medium uppercase tracking-wide text-xs">
+                        {title}
+                      </span>
+                      <span class="text-xl flex gap-1">{content()}</span>
+                    </article>
+                  </Show>
+                )}
+              </For>
             </div>
 
             {/* Action Buttons */}
             <div class="flex flex-col md:flex-row items-end justify-end gap-3 mt-3">
-              <button
-                class="btn btn-accent btn-sm flex gap-1 items-center"
+              <Button
+                class="btn-accent btn-sm"
+                icon={
+                  running()
+                    ? 'i-carbon-pause-filled'
+                    : 'i-carbon-play-filled-alt'
+                }
                 onClick={() => toggle()}
               >
-                {running() ? (
-                  <>
-                    <div class="i-carbon-pause-filled"></div>
-                    <span>Stop</span>
-                  </>
-                ) : (
-                  <>
-                    <div class="i-carbon-play-filled-alt"></div>
-                    <span>Start</span>
-                  </>
-                )}
-              </button>
-              <button class="btn btn-ghost btn-sm flex gap-1 items-center">
-                <div class="i-carbon-printer"></div>
-                <span>Print</span>
-              </button>
+                {running() ? 'Stop' : 'Start'}
+              </Button>
+              {/* TODO: implement print */}
+              {/* <Button class="btn-ghost btn-sm" icon="i-carbon-printer"> */}
+              {/*   Print */}
+              {/* </Button> */}
               <ConfirmModal
-                id="delete-project-modal"
                 title="Delete Project"
                 message="Are you sure you would like to delete this project?"
+                icon="i-mdi-warning"
                 onConfirm={removeProject}
               >
-                <label
-                  for="delete-project-modal"
-                  class="btn btn-ghost text-error btn-sm flex gap-1 items-center"
+                <Button
+                  icon="i-carbon-delete"
+                  class="btn-ghost text-error btn-sm"
                 >
-                  <div class="i-carbon-delete"></div>
-                  <span>Delete</span>
-                </label>
+                  Delete
+                </Button>
               </ConfirmModal>
             </div>
           </div>
 
           {/* Logs */}
-          <div class="py-5 grid grid-cols-[repeat(auto-fill,minmax(23rem,1fr))] gap-3">
+          <div class="py-5 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3">
             <For each={[...project.logs].reverse()}>
               {(log, index) => (
-                <div
-                  class="p-5 rounded"
+                <article
+                  class="p-5 rounded-xl"
                   classList={{
-                    'bg-base-300': log.done,
+                    'bg-stone-900': log.done,
                     'bg-green-900': !log.done,
                   }}
                 >
@@ -261,74 +269,82 @@ export const ProjectPage: Component = () => {
                   </h3>
 
                   {/* Log Data */}
-                  <div class="grid grid-cols-[1fr_3fr] items-baseline gap-x-3 gap-y-3">
-                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                      ID:
-                    </span>
-                    <span class="hyphens-auto break-all">{log.id}</span>
-                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                      Start:
-                    </span>
-                    <span>
-                      {new Date(log.startedAt).toLocaleString(undefined, {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        weekday: 'short',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        second: 'numeric',
-                      })}
-                    </span>
-                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                      End:
-                    </span>
-                    <span>
-                      {new Date(log.endedAt).toLocaleString(undefined, {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        weekday: 'short',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        second: 'numeric',
-                      })}
-                    </span>
-                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                      Duration:
-                    </span>
-                    <span>
-                      {formatTime((log.endedAt - log.startedAt) / 1000)}
-                    </span>
-                    <span class="uppercase text-xs font-semibold tracking-wider text-right">
-                      Comment:
-                    </span>
-                    <span>{log.comment || 'None'}</span>
+                  <div class="items-baseline flex flex-col gap-3">
+                    <For
+                      each={[
+                        // {
+                        //   title: 'ID',
+                        //   content: () => log.id,
+                        // },
+                        {
+                          title: 'Start',
+                          content: () =>
+                            new Date(log.startedAt).toLocaleString(undefined, {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: 'numeric',
+                              minute: 'numeric',
+                              second: 'numeric',
+                            }),
+                        },
+                        {
+                          title: 'End',
+                          content: () =>
+                            new Date(log.endedAt).toLocaleString(undefined, {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: 'numeric',
+                              minute: 'numeric',
+                              second: 'numeric',
+                            }),
+                        },
+                        {
+                          title: 'Duration',
+                          content: () =>
+                            formatTime((log.endedAt - log.startedAt) / 1000),
+                        },
+                        {
+                          title: 'Comment',
+                          content: () => log.comment || 'None',
+                        },
+                      ]}
+                    >
+                      {({ title, content }) => (
+                        <p class="flex gap-1 items-baseline">
+                          <span>{title}:</span>
+                          <span class="font-bold hyphens-auto break-all">
+                            {content?.()}
+                          </span>
+                        </p>
+                      )}
+                    </For>
                   </div>
 
                   {/* Log Action Buttons */}
                   {log.done && (
                     <div class="flex gap-3 justify-end mt-auto pt-5">
-                      <button
-                        class="btn btn-sm flex gap-1 items-center"
+                      <Button
+                        class="btn-sm btn-primary"
+                        icon="i-mdi-pencil"
                         onClick={() => {
                           setSelectedLog(log)
                           setCommentLogModalOpen(true)
                         }}
                       >
-                        <span class="i-carbon-edit"></span>
-                        <span>Comment</span>
-                      </button>
-                      <button
-                        class="btn btn-sm flex gap-1 items-center btn-ghost text-error"
+                        Comment
+                      </Button>
+                      <Button
+                        class="btn-sm btn-ghost text-error"
+                        icon="i-mdi-delete"
                         onClick={() => removeLog(log.id)}
                       >
-                        <span class="i-carbon-delete"></span>
-                        <span>Delete</span>
-                      </button>
+                        Delete
+                      </Button>
                     </div>
                   )}
-                </div>
+                </article>
               )}
             </For>
             {/* Modals */}

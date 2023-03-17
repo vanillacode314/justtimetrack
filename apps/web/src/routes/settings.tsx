@@ -8,17 +8,15 @@ export const SettingsPage: Component = () => {
   return (
     <section class="mx-auto max-w-xl p-5 flex flex-col" aria-label="settings">
       <ConfirmModal
-        id="clear-data-modal"
         title="Clear Data"
         message="Are you sure you want to clear all data?"
+        icon="i-mdi-warning"
         onConfirm={() => {
           resetUserState()
           toast('Cleared Data Successfully', '', { type: 'success' })
         }}
       >
-        <button class="btn btn-error">
-          Clear Data
-        </button>
+        <button class="btn btn-error">Clear Data</button>
       </ConfirmModal>
     </section>
   )
