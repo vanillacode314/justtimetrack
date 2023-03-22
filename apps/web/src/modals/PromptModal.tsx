@@ -19,7 +19,7 @@ let resolve: ((value: string | undefined) => void) | undefined
 export async function prompt(
   opts: Omit<z.input<typeof stateSchema>, 'value' | 'open'>
 ): Promise<string | undefined> {
-  setState({ ...opts, open: true, value: opts.initialValue })
+  setState({ ...opts, open: true, value: opts.initialValue ?? '' })
   return new Promise<string | undefined>((res) => (resolve = res))
 }
 
