@@ -307,10 +307,22 @@ export const ProjectPage: Component = () => {
                             formatTime((log.endedAt - log.startedAt) / 1000),
                         },
                         {
+                          title: 'Earnings',
+                          condition: () => project.paid,
+                          content: () => {
+                            const amount = round(
+                              ((log.endedAt - log.startedAt) / (1000 * 3600)) *
+                                project.hourlyRate,
+                              2
+                            )
+                            return `${amount} ${project.currency}`
+                          },
+                        },
+                        {
                           title: 'Comment',
                           content: () => log.comment || 'None',
                         },
-                      ]}
+                      ].filter(({ condition }) => condition?.() ?? true)}
                     >
                       {({ title, content }) => (
                         <p class="flex gap-1 items-baseline">
