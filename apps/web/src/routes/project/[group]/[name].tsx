@@ -185,7 +185,7 @@ export const ProjectPage: Component = () => {
                     condition: () => project.paid,
                     content: () => (
                       <>
-                        <span class="font-boldsemiboli">
+                        <span class="font-bold">
                           {round(
                             (totalLoggedTime() / 3600) * project.hourlyRate,
                             2
