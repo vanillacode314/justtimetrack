@@ -161,7 +161,11 @@ export const AddNewProjectModal: Component = () => {
         onSubmit={onSubmit}
       >
         <span class="grid grid-cols-[1fr_auto] gap-3 items-end">
-          <Select label="Project Group" value={formData.group}>
+          <Select
+            label="Project Group"
+            value={formData.group}
+            onChange={(e) => setFormData('group', e.currentTarget.value)}
+          >
             <Option value="null" disabled>
               Select project group
             </Option>
@@ -206,7 +210,7 @@ export const AddNewProjectModal: Component = () => {
               onInput={(e) => setFormData('hourlyRate', +e.currentTarget.value)}
             />
             <Input
-              id="project-hourly-rate"
+              id="project-currency"
               type="text"
               placeholder="Currency"
               label="Currency"
