@@ -8,6 +8,7 @@ export interface Options {
   moveCancelThreshold?: number
   condition?: () => boolean
   vibrate?: () => boolean
+  onUp?: () => boolean
 }
 
 function distance(pos1: Pos, pos2: Pos): number {
@@ -26,6 +27,7 @@ export const longpress = (
     duration = () => 1000,
     moveCancelThreshold = 50,
     vibrate = () => true,
+    onUp = () => false,
   }: Options = {}
 ) => {
   const cb = () => {
@@ -35,6 +37,7 @@ export const longpress = (
   let timer: ReturnType<typeof setTimeout>
   let startPos: Pos = { x: -1, y: -1 }
   let touchId: number = -1
+  let timerDone: boolean = false
 
   const onTouchStart = (e: TouchEvent) => {
     if (!condition()) return
@@ -42,20 +45,26 @@ export const longpress = (
     const touch = e.changedTouches[0]
     touchId = touch.identifier
     startPos = { x: touch.screenX, y: touch.screenY }
-    timer = setTimeout(() => cb(), duration())
+    timer = setTimeout(() => {
+      onUp() ? (timerDone = true) : cb()
+    }, duration())
   }
 
   const onMouseDown = (e: MouseEvent) => {
     if (!condition()) return
     const el = e.currentTarget as HTMLElement
     el.classList.add('__longpress__')
-    timer = setTimeout(() => cb(), duration())
+    timer = setTimeout(() => {
+      onUp() ? (timerDone = true) : cb()
+    }, duration())
   }
 
   const onMouseUp = (e: MouseEvent) => {
     const el = e.currentTarget as HTMLElement
     setTimeout(() => el.classList.remove('__longpress__'), 500)
     clearTimeout(timer)
+    if (timerDone) cb()
+    timerDone = false
   }
 
   const onTouchMove = throttle((e: TouchEvent) => {
@@ -74,6 +83,8 @@ export const longpress = (
   const onTouchEnd = () => {
     touchId = -1
     clearTimeout(timer)
+    if (timerDone) cb()
+    timerDone = false
   }
 
   const onContextMenu = (e: Event) => {

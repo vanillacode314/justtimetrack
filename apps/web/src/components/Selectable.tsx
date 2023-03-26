@@ -9,19 +9,23 @@ export const Selectable: Component<SelectableProps> = (props) => {
   const [selected, setSelected] = createSignal<boolean>(false)
   const [appState, setAppState] = useAppState()
 
-
   createEffect(() => props.onChange?.(selected()))
   return (
     <div
       class="relative grid rounded-xl overflow-hidden"
+      classList={{
+        'user-select-none': appState.mode === 'selection',
+      }}
       ref={(el) => {
-        longpress(el, {
+        const dispose = longpress(el, {
           duration: () => (appState.mode === 'selection' ? 10 : 1000),
           vibrate: () => (appState.mode === 'selection' ? false : true),
+          onUp: () => appState.mode === 'selection',
           callback() {
             setSelected(!selected())
           },
         })
+        onCleanup(dispose)
       }}
     >
       <Show when={selected()}>
