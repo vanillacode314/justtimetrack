@@ -5,6 +5,10 @@ export function round(input: number, precision: number = 2): number {
   const p = Math.pow(10, precision)
   return Math.round(input * p) / p
 }
+export function formatTimeToString(inputSeconds: number) {
+  const { hours, minutes, seconds } = formatSeconds(inputSeconds)
+  return `${hours}h ${minutes}m ${seconds}s`
+}
 
 export function formatSeconds(inputSeconds: number) {
   const hours = Math.floor(inputSeconds / 3600)
