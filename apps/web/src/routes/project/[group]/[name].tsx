@@ -248,14 +248,14 @@ export const ProjectPage: Component = () => {
             <For each={[...project.logs].reverse()}>
               {(log, index) => (
                 <article
-                  class="p-5 rounded-xl"
+                  class="p-5 rounded-xl flex flex-col gap-3"
                   classList={{
                     'bg-stone-900': log.done,
                     'bg-green-900': !log.done,
                   }}
                 >
                   {/* Log Title */}
-                  <h3 class="flex justify-between items-baseline mb-3">
+                  <h3 class="flex justify-between items-baseline">
                     <div class="uppercase font-bold text-lg">
                       Log {project.logs.length - index()}
                     </div>
@@ -270,7 +270,7 @@ export const ProjectPage: Component = () => {
                   </h3>
 
                   {/* Log Data */}
-                  <div class="items-baseline flex flex-col gap-3">
+                  <div class="items-baseline flex flex-col gap-2">
                     <For
                       each={[
                         // {
@@ -335,9 +335,11 @@ export const ProjectPage: Component = () => {
                     </For>
                   </div>
 
+                  <span class="grow"></span>
+
                   {/* Log Action Buttons */}
                   {log.done && (
-                    <div class="flex gap-3 justify-end mt-auto pt-5">
+                    <div class="flex gap-3 justify-end mt-auto">
                       <Button
                         class="btn-sm btn-primary"
                         icon="i-mdi-pencil"
