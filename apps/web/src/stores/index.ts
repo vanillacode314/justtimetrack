@@ -2,7 +2,9 @@ import { projectGroupSchema } from '~/types'
 import { createStorageStore } from '~/utils/stores'
 import z from 'zod'
 
+const modesSchema = z.enum(['default', 'selection'])
 const appStateSchema = z.object({
+  mode: modesSchema.default('default'),
   drawerVisible: z.boolean().default(false),
   selectedProjectGroupId: z.string().default(''),
 })
