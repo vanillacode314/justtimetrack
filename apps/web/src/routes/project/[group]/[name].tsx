@@ -327,7 +327,7 @@ export const ProjectPage: Component = () => {
                       {({ title, content }) => (
                         <p class="flex gap-1 items-baseline">
                           <span>{title}:</span>
-                          <span class="font-bold hyphens-auto break-all">
+                          <span class="font-bold hyphens-auto break-words">
                             {content?.()}
                           </span>
                         </p>
