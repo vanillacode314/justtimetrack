@@ -1,3 +1,4 @@
+import { ReactiveSet } from '@solid-primitives/set'
 import { Component } from 'solid-js'
 import { Button } from 'ui'
 import ConfirmModal from '~/modals/ConfirmModal'
@@ -7,19 +8,101 @@ interface Props {
   groupIndex: number
   projectIndex: number
   project: TProject
+  selectedLogs: ReactiveSet<TActivityLog['id']>
 }
 export const ProjectDashboard: Component<Props> = (props) => {
   const navigate = useNavigate()
   const [_userState, setUserState] = useUserState()
+  const stats = () =>
+    props.selectedLogs.size === 0
+      ? [
+          {
+            title: 'Total Logged Time',
+            content: () => (
+              <span class="font-bold">
+                {formatTimeToString(totalLoggedTime(props.project.logs))}
+              </span>
+            ),
+          },
+          {
+            title: 'Hourly Rate',
+            condition: props.project.paid,
+            content: () => (
+              <>
+                <span class="font-bold">{props.project.hourlyRate}</span>
+                {props.project.currency}/hr
+              </>
+            ),
+          },
+          {
+            title: 'Total Earnings',
+            condition: props.project.paid,
+            content: () => (
+              <>
+                <span class="font-bold">
+                  {round(
+                    (totalLoggedTime(props.project.logs) / 3600) *
+                      props.project.hourlyRate,
+                    2
+                  )}{' '}
+                </span>
+                <span>{props.project.currency}</span>
+              </>
+            ),
+          },
+        ]
+      : [
+          {
+            title: 'Selected Logged Time',
+            content: () => (
+              <span class="font-bold">
+                {formatTimeToString(
+                  totalLoggedTime(
+                    props.project.logs.filter((log) =>
+                      props.selectedLogs.has(log.id)
+                    )
+                  )
+                )}
+              </span>
+            ),
+          },
+          {
+            title: 'Hourly Rate',
+            condition: props.project.paid,
+            content: () => (
+              <>
+                <span class="font-bold">{props.project.hourlyRate}</span>
+                {props.project.currency}/hr
+              </>
+            ),
+          },
+          {
+            title: 'Selected Earnings',
+            condition: props.project.paid,
+            content: () => (
+              <>
+                <span class="font-bold">
+                  {round(
+                    (totalLoggedTime(
+                      props.project.logs.filter((log) =>
+                        props.selectedLogs.has(log.id)
+                      )
+                    ) /
+                      3600) *
+                      props.project.hourlyRate,
+                    2
+                  )}{' '}
+                </span>
+                <span>{props.project.currency}</span>
+              </>
+            ),
+          },
+        ]
   const runningIndex = () => props.project.logs.findIndex((log) => !log.done)
   const running = () => runningIndex() !== -1
 
-  const totalLoggedTime = () =>
-    props.project.logs.reduce(
-      (sum, log) => sum + log.endedAt - log.startedAt,
-      0
-    ) / 1000
-
+  const totalLoggedTime = (logs: TActivityLog[]) =>
+    logs.reduce((sum, log) => sum + log.endedAt - log.startedAt, 0) / 1000
 
   function toggle() {
     if (running()) {
@@ -77,50 +160,14 @@ export const ProjectDashboard: Component<Props> = (props) => {
       </h2>
       <p>{props.project.description}</p>
       <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-        <For
-          each={[
-            {
-              title: 'Total Logged Time',
-              content: () => (
-                <span class="font-bold">{formatTimeToString(totalLoggedTime())}</span>
-              ),
-            },
-            {
-              title: 'Hourly Rate',
-              condition: () => props.project.paid,
-              content: () => (
-                <>
-                  <span class="font-bold">{props.project.hourlyRate}</span>
-                  {props.project.currency}/hr
-                </>
-              ),
-            },
-            {
-              title: 'Total Earnings',
-              condition: () => props.project.paid,
-              content: () => (
-                <>
-                  <span class="font-bold">
-                    {round(
-                      (totalLoggedTime() / 3600) * props.project.hourlyRate,
-                      2
-                    )}{' '}
-                  </span>
-                  <span>{props.project.currency}</span>
-                </>
-              ),
-            },
-          ]}
-        >
-          {({ title, content, condition }) => (
-            <Show when={condition?.() ?? true}>
-              <article class="flex flex-col p-5 gap-1 bg-black/10 rounded-xl w-full">
-                <span class="font-medium uppercase tracking-wide text-xs">
-                  {title}
-                </span>
-                <span class="text-xl flex gap-1">{content()}</span>
-              </article>
-            </Show>
+        <For each={stats().filter((stat) => stat.condition ?? true)}>
+          {({ title, content }) => (
+            <article class="flex flex-col p-5 gap-1 bg-black/10 rounded-xl w-full">
+              <span class="font-medium uppercase tracking-wide text-xs">
+                {title}
+              </span>
+              <span class="text-xl flex gap-1">{content()}</span>
+            </article>
           )}
         </For>
       </div>

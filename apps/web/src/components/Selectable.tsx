@@ -2,12 +2,15 @@ import { Component, JSXElement } from 'solid-js'
 import { longpress } from '~/utils/use-longpress'
 
 interface SelectableProps {
+  onChange?: (selected: boolean) => void
   children: (selected: () => boolean) => JSXElement
 }
 export const Selectable: Component<SelectableProps> = (props) => {
   const [selected, setSelected] = createSignal<boolean>(false)
   const [appState, setAppState] = useAppState()
 
+
+  createEffect(() => props.onChange?.(selected()))
   return (
     <div
       class="relative grid rounded-xl overflow-hidden"

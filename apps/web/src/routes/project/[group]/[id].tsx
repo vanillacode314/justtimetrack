@@ -2,12 +2,13 @@ import { Component } from 'solid-js'
 import { A } from 'solid-start'
 import { LogCard } from '~/components/LogCard'
 import { ProjectDashboard } from '~/components/ProjectDashboard'
+import { ReactiveSet } from '@solid-primitives/set'
 
 export const ProjectPage: Component = () => {
   const [userState, setUserState] = useUserState()
+  const [appState, setAppState] = useAppState()
 
   const params = useParams()
-
 
   const [error, setError] = createSignal<string>('')
 
@@ -31,6 +32,13 @@ export const ProjectPage: Component = () => {
     else project = group.projects[projectIndex]
   }
 
+  const selectedLogs = new ReactiveSet<TActivityLog['id']>()
+  createEffect(
+    on(
+      () => selectedLogs.size,
+      (size) => setAppState('mode', size > 0 ? 'selection' : 'default')
+    )
+  )
   // check if a log is ongoing
   const runningIndex = () => project.logs.findIndex((log) => !log.done)
   const running = () => runningIndex() !== -1
@@ -76,22 +84,20 @@ export const ProjectPage: Component = () => {
           when={!error()}
           fallback={<div class="alert alert-error">{error}</div>}
         >
-          <ProjectDashboard
-            groupIndex={groupIndex}
-            projectIndex={projectIndex}
-            project={project}
-          />
+          <ProjectDashboard {...{ groupIndex, projectIndex, project, selectedLogs }} />
 
           {/* Logs */}
           <div class="py-5 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3">
             <For each={[...project.logs].reverse()}>
               {(log, index) => (
-                <LogCard 
-                  groupIndex={groupIndex}
-                  projectIndex={projectIndex}
-                  project={project}
-                  log={log}
+                <LogCard
+                  onSelectChange={(selected) =>
+                    selected
+                      ? selectedLogs.add(log.id)
+                      : selectedLogs.delete(log.id)
+                  }
                   logIndex={() => project.logs.length - index()}
+                  {...{ groupIndex, projectIndex, project, log }}
                 />
               )}
             </For>
