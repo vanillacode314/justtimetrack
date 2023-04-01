@@ -5,6 +5,7 @@ import { ProjectDashboard } from '~/components/ProjectDashboard'
 import { ReactiveSet } from '@solid-primitives/set'
 import { removeProject } from '~/stores'
 import ConfirmModal from '~/modals/ConfirmModal'
+import { exportsSchema } from '~/types'
 
 export const ProjectPage: Component = () => {
   const [userState, setUserState] = useUserState()
@@ -106,6 +107,9 @@ export const ProjectPage: Component = () => {
     }
   }
 
+  const [copyState, setCopyState] = createSignal<
+    'neutral' | 'success' | 'error'
+  >('neutral')
   setActions([
     {
       icon: 'i-mdi-arrow-left',
@@ -113,6 +117,63 @@ export const ProjectPage: Component = () => {
       action: () => navigate('/'),
     },
     'spacer',
+    {
+      id: 'clipboard',
+      icon: 'i-mdi-clipboard',
+      label: () =>
+        copyState() === 'neutral'
+          ? 'Copy Project ID'
+          : copyState() === 'success'
+          ? 'Copy Success'
+          : 'Copy Error',
+      classes: () =>
+        copyState() === 'neutral'
+          ? ''
+          : copyState() === 'success'
+          ? 'btn-success'
+          : 'btn-error',
+      action: async () => {
+        setCopyState('neutral')
+        try {
+          await navigator.clipboard.writeText(String(project.id))
+          setCopyState('success')
+        } catch {
+          setCopyState('error')
+        } finally {
+          setTimeout(() => {
+            setCopyState('neutral')
+          }, 3000)
+        }
+      },
+    },
+    {
+      icon: 'i-mdi-export',
+      label: 'Export',
+      action: () => {
+        const dateString = new Date().toLocaleString(navigator.language, {
+          dateStyle: 'short',
+          timeStyle: 'short',
+          hour12: false,
+        })
+        exportToJsonFile(
+          exportsSchema.parse({
+            projectGroups: [
+              {
+                ...group,
+                projects: group.projects.filter(
+                  ($project) => $project.id === project.id
+                ),
+              },
+            ],
+          }),
+          `justtimetrack-${project.name
+            .toLowerCase()
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, ' ')
+            .replace(/ /g, '_')}-${dateString}.json`
+        )
+      },
+    },
     {
       icon: 'i-mdi-trash',
       label: 'Delete',
