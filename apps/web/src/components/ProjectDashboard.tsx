@@ -1,18 +1,17 @@
 import { ReactiveSet } from '@solid-primitives/set'
 import { Component } from 'solid-js'
-import { Button } from 'ui'
-import ConfirmModal from '~/modals/ConfirmModal'
 import { formatTimeToString } from '~/utils'
 
 interface Props {
+  deleteProjectModalOpen?: () => boolean
+  group: TProjectGroup
   groupIndex: number
   projectIndex: number
   project: TProject
   selectedLogs: ReactiveSet<TActivityLog['id']>
 }
 export const ProjectDashboard: Component<Props> = (props) => {
-  const navigate = useNavigate()
-  const [_userState, setUserState] = useUserState()
+  const [_userState, _setUserState] = useUserState()
   const stats = () =>
     props.selectedLogs.size === 0
       ? [
@@ -98,51 +97,9 @@ export const ProjectDashboard: Component<Props> = (props) => {
             ),
           },
         ]
-  const runningIndex = () => props.project.logs.findIndex((log) => !log.done)
-  const running = () => runningIndex() !== -1
 
   const totalLoggedTime = (logs: TActivityLog[]) =>
     logs.reduce((sum, log) => sum + log.endedAt - log.startedAt, 0) / 1000
-
-  function toggle() {
-    if (running()) {
-      setUserState(
-        'projectGroups',
-        props.groupIndex,
-        'projects',
-        props.projectIndex,
-        'logs',
-        runningIndex(),
-        produce((log) => {
-          log.endedAt = Date.now()
-          log.done = true
-        })
-      )
-    } else {
-      setUserState(
-        'projectGroups',
-        props.groupIndex,
-        'projects',
-        props.projectIndex,
-        'logs',
-        props.project.logs.length,
-        {
-          id: crypto.randomUUID(),
-          startedAt: Date.now(),
-          endedAt: Date.now(),
-          done: false,
-          comment: '',
-        }
-      )
-    }
-  }
-
-  function removeProject() {
-    navigate('/')
-    setUserState('projectGroups', props.groupIndex, 'projects', (projects) =>
-      projects.filter((project) => project.id !== props.project.id)
-    )
-  }
 
   return (
     <div class="bg-green-900 p-5 rounded-xl flex flex-col gap-3">
@@ -170,33 +127,6 @@ export const ProjectDashboard: Component<Props> = (props) => {
             </article>
           )}
         </For>
-      </div>
-
-      {/* Action Buttons */}
-      <div class="flex flex-col md:flex-row items-end justify-end gap-3 mt-3">
-        <Button
-          class="btn-accent btn-sm"
-          icon={
-            running() ? 'i-carbon-pause-filled' : 'i-carbon-play-filled-alt'
-          }
-          onClick={() => toggle()}
-        >
-          {running() ? 'Stop' : 'Start'}
-        </Button>
-        {/* TODO: implement print */}
-        {/* <Button class="btn-ghost btn-sm" icon="i-carbon-printer"> */}
-        {/*   Print */}
-        {/* </Button> */}
-        <ConfirmModal
-          title="Delete Project"
-          message="Are you sure you would like to delete this project?"
-          icon="i-mdi-warning"
-          onConfirm={removeProject}
-        >
-          <Button icon="i-carbon-delete" class="btn-ghost text-error btn-sm">
-            Delete
-          </Button>
-        </ConfirmModal>
       </div>
     </div>
   )

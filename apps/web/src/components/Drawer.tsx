@@ -1,8 +1,10 @@
 import { Component, JSXElement } from 'solid-js'
 import { A } from 'solid-start'
 import { setAddNewProjectModalOpen } from '~/modals/AddNewProjectModal'
+import { setActions } from '~/stores'
 
 interface Props {
+  class?: string
   children: JSXElement
 }
 
@@ -48,7 +50,7 @@ export const Drawer: Component<Props> = (props) => {
   const [appState, setAppState] = useAppState()
 
   return (
-    <div class="drawer drawer-mobile">
+    <div class={clsx('drawer drawer-mobile', props.class)}>
       <input
         id="main-drawer"
         type="checkbox"
@@ -61,7 +63,7 @@ export const Drawer: Component<Props> = (props) => {
         <label for="main-drawer" class="drawer-overlay"></label>
         <ul class="menu p-4 w-80 bg-base-300 text-base-content gap-2">
           {/*  Sidebar content here */}
-          <span class="uppercase font-black text-2xl text-center p-3 tracking-wider">
+          <span class="uppercase font-black text-2xl text-center p-5 tracking-wider">
             JustTimeTrack
           </span>
           {/* Links */}
@@ -75,12 +77,12 @@ export const Drawer: Component<Props> = (props) => {
                       end={true}
                       class="text-xs font-bold uppercase tracking-wide"
                     >
-                      {icon && <div class={icon}></div>}
+                      {icon && <div class={clsx(icon, 'text-lg')}></div>}
                       {label}
                     </A>
                   ) : (
                     <div class="text-xs font-bold uppercase tracking-wide">
-                      {icon && <div class={icon}></div>}
+                      {icon && <div class={clsx(icon, 'text-lg')}></div>}
                       {label}
                     </div>
                   )}
@@ -95,7 +97,7 @@ export const Drawer: Component<Props> = (props) => {
                           class="text-xs font-bold uppercase tracking-wide"
                         >
                           &nbsp;
-                          {icon && <div class={icon}></div>}
+                          {icon && <div class={clsx(icon, 'text-lg')}></div>}
                           {label}
                         </A>
                       ) : (
@@ -104,7 +106,7 @@ export const Drawer: Component<Props> = (props) => {
                           class="text-xs font-bold uppercase tracking-wide"
                         >
                           &nbsp;
-                          {icon && <div class={icon}></div>}
+                          {icon && <div class={clsx(icon, 'text-lg')}></div>}
                           {label}
                         </button>
                       )}

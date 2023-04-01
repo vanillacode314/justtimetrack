@@ -3,14 +3,19 @@ import { A } from 'solid-start'
 import { LogCard } from '~/components/LogCard'
 import { ProjectDashboard } from '~/components/ProjectDashboard'
 import { ReactiveSet } from '@solid-primitives/set'
+import { removeProject } from '~/stores'
+import ConfirmModal from '~/modals/ConfirmModal'
 
 export const ProjectPage: Component = () => {
   const [userState, setUserState] = useUserState()
   const [appState, setAppState] = useAppState()
 
+  const navigate = useNavigate()
   const params = useParams()
 
   const [error, setError] = createSignal<string>('')
+  const [deleteProjectModalOpen, setDeleteProjectModalOpen] =
+    createSignal<boolean>(false)
 
   // find group
   const groupIndex = userState.projectGroups.findIndex(
@@ -68,24 +73,80 @@ export const ProjectPage: Component = () => {
     }, 1000)
   })
 
+  function toggle() {
+    if (running()) {
+      setUserState(
+        'projectGroups',
+        groupIndex,
+        'projects',
+        projectIndex,
+        'logs',
+        runningIndex(),
+        produce((log) => {
+          log.endedAt = Date.now()
+          log.done = true
+        })
+      )
+    } else {
+      setUserState(
+        'projectGroups',
+        groupIndex,
+        'projects',
+        projectIndex,
+        'logs',
+        project.logs.length,
+        {
+          id: crypto.randomUUID(),
+          startedAt: Date.now(),
+          endedAt: Date.now(),
+          done: false,
+          comment: '',
+        }
+      )
+    }
+  }
+
+  setActions([
+    {
+      icon: 'i-mdi-arrow-left',
+      label: 'Back',
+      action: () => navigate('/'),
+    },
+    'spacer',
+    {
+      icon: 'i-mdi-trash',
+      label: 'Delete',
+      action: () => setDeleteProjectModalOpen(true),
+    },
+    {
+      icon: () => (running() ? 'i-mdi-pause' : 'i-mdi-play'),
+      classes: () => (running() ? 'btn-warning' : 'btn-primary'),
+      label: () => (running() ? 'Pause' : 'Start'),
+      action: toggle,
+    },
+  ])
+
   return (
-    <div class="flex flex-col gap-5 p-5">
-      <nav class="flex">
-        <A
-          class="p-2 bg-stone-800 grid place-content-center rounded-full"
-          href="/"
-          aria-label="go back"
-        >
-          <span class="i-carbon-arrow-left text-xl" />
-        </A>
-      </nav>
+    <div class="flex flex-col gap-5">
       <main>
         <Show
           when={!error()}
           fallback={<div class="alert alert-error">{error}</div>}
         >
-          <ProjectDashboard {...{ groupIndex, projectIndex, project, selectedLogs }} />
-
+          <ProjectDashboard
+            {...{ group, groupIndex, projectIndex, project, selectedLogs }}
+          />
+          <ConfirmModal
+            open={deleteProjectModalOpen}
+            onClose={() => setDeleteProjectModalOpen(false)}
+            title="Delete Project"
+            message="Are you sure you would like to delete this project?"
+            icon="i-mdi-warning"
+            onConfirm={() => {
+              navigate('/')
+              removeProject(group.id, project.id)
+            }}
+          />
           {/* Logs */}
           <div class="py-5 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3">
             <For each={[...project.logs].reverse()}>

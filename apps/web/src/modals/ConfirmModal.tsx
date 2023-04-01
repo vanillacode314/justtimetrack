@@ -8,18 +8,20 @@ type ProcessConfirm = <T>(
 ) => Promise<T>
 
 interface Props {
+  open?: () => boolean
   title: string
   message: string
   icon?: string
   processingLabel?: string
   onConfirm: (processConfirm: ProcessConfirm) => void
   onCancel?: () => void
+  onClose?: () => void
   children?: ((open: () => void) => JSXElement) | JSXElement
 }
 
 export const ConfirmModal: Component<Props> = (props) => {
   const [processing, setProcessing] = createSignal<string>('')
-  const { onConfirm, onCancel } = props
+  const { onClose, onConfirm, onCancel } = props
   const [open, setOpen] = createSignal<boolean>(false)
 
   const processConfirm: ProcessConfirm = (
@@ -37,11 +39,7 @@ export const ConfirmModal: Component<Props> = (props) => {
 
   return (
     <>
-      <BaseModal
-        open={open()}
-        onOpen={() => setOpen(true)}
-        onClose={() => setOpen(false)}
-      >
+      <BaseModal open={props.open?.() || open()}>
         <form
           method="dialog"
           class="flex flex-col gap-5"
@@ -69,6 +67,7 @@ export const ConfirmModal: Component<Props> = (props) => {
               onclick={() => {
                 setOpen(false)
                 onCancel?.()
+                onClose?.()
               }}
               class="btn-ghost"
             >

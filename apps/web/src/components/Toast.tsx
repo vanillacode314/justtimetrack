@@ -49,7 +49,7 @@ export const toast = (
   setTimeout(dismiss, duration)
 }
 
-export const Toast: Component = () => {
+export const ToastComp: Component = () => {
   return () => (
     <div class="toast toast-end">
       <For each={messages}>
@@ -68,5 +68,3 @@ export const Toast: Component = () => {
     </div>
   )
 }
-
-export default Toast

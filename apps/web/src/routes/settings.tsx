@@ -3,7 +3,7 @@ import { toast } from '~/components/Toast'
 import ConfirmModal from '~/modals/ConfirmModal'
 
 export const SettingsPage: Component = () => {
-  const [, , resetUserState] = useUserState()
+  const [, , { reset: resetUserState }] = useUserState()
 
   return (
     <section class="mx-auto max-w-xl p-5 flex flex-col" aria-label="settings">

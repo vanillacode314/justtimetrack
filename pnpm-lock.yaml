@@ -50,7 +50,9 @@ importers:
       '@unocss/reset': ^0.50.6
       api: workspace:*
       autoprefixer: ^10.4.14
+      clsx: ^1.2.1
       daisyui: ^2.51.4
+      devalue: ^4.3.0
       eslint: 8.36.0
       eslint-config-custom: workspace:*
       lodash-es: ^4.17.21
@@ -81,6 +83,8 @@ importers:
       '@trpc/server': 10.16.0
       '@unocss/reset': 0.50.6
       api: link:../api
+      clsx: 1.2.1
+      devalue: 4.3.0
       lodash-es: 4.17.21
       solid-js: 1.6.15
       solid-start: 0.2.23_udpj6tl2eeqeiykv5lzdp2pefe
@@ -2917,6 +2921,10 @@ packages:
       acorn-node: 1.8.2
       defined: 1.0.1
       minimist: 1.2.8
+
+  /devalue/4.3.0:
+    resolution: {integrity: sha512-n94yQo4LI3w7erwf84mhRUkUJfhLoCZiLyoOZ/QFsDbcWNZePrLwbQpvZBUG2TNxwV3VjCKPxkiiQA6pe3TrTA==}
+    dev: false
 
   /didyoumean/1.2.2:
     resolution: {integrity: sha512-gxtyfqMg7GKyhQmb056K7M3xszy/myH8w+B4RT+QXBQsvAOdc3XymqDDPHx1BgPgsdAA5SIifona89YtRATDzw==}

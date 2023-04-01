@@ -30,6 +30,8 @@ export default defineConfig({
         '@solidjs/router',
         {
           'solid-start': ['A'],
+          zod: ['z'],
+          clsx: ['clsx'],
           'solid-js': ['createComputed'],
         },
       ],

@@ -21,6 +21,8 @@
     "@trpc/server": "10.16.0",
     "@unocss/reset": "^0.50.6",
     "api": "workspace:*",
+    "clsx": "^1.2.1",
+    "devalue": "^4.3.0",
     "lodash-es": "^4.17.21",
     "solid-js": "^1.6.15",
     "solid-start": "^0.2.23",

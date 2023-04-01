@@ -1,10 +1,65 @@
 import { Button } from 'ui'
 import { setAddNewProjectModalOpen } from '~/modals/AddNewProjectModal'
 import ConfirmModal from '~/modals/ConfirmModal'
+import { setActions, userStateSchema } from '~/stores'
+import * as devalue from 'devalue'
+import { projectGroupSchema } from '~/types'
 
 export default function HomePage() {
   const [userState, setUserState] = useUserState()
   const [appState, setAppState] = useAppState()
+
+  const exportsSchema = z.object({
+    projectGroups: projectGroupSchema.array(),
+  })
+
+  setActions([
+    'spacer',
+    {
+      icon: 'i-mdi-import',
+      label: 'Import Project(s)',
+      action: async () => {
+        const json = await getFile()
+        if (!json) return
+        const result = exportsSchema.safeParse(devalue.parse(json))
+        if (!result.success) {
+          toast('Error importing projects', 'Malformed data file', {
+            type: 'error',
+            duration: 5000,
+          })
+          return
+        }
+        const { projectGroups } = result.data
+        setUserState('projectGroups', (groups) =>
+          userStateSchema.shape.projectGroups.parse([
+            ...groups,
+            ...projectGroups,
+          ])
+        )
+      },
+    },
+    {
+      icon: 'i-mdi-export',
+      label: 'Export All',
+      action: () => {
+        const dateString = new Date().toLocaleString(navigator.language, {
+          dateStyle: 'short',
+          timeStyle: 'short',
+          hour12: false,
+        })
+        exportToJsonFile(
+          exportsSchema.parse(userState),
+          `justtimetrack-${dateString}.json`
+        )
+      },
+    },
+    {
+      icon: 'i-carbon-add',
+      label: 'Add',
+      classes: 'btn-primary',
+      action: () => setAddNewProjectModalOpen(true),
+    },
+  ])
 
   const runningProjects = () => {
     const retval = []
@@ -33,7 +88,7 @@ export default function HomePage() {
   }
 
   return (
-    <main class="p-5 h-full flex flex-col gap-5">
+    <main class="h-full flex flex-col gap-5">
       <Show
         when={userState.projectGroups.length > 0}
         fallback={
