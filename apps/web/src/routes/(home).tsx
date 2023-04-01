@@ -3,15 +3,12 @@ import { setAddNewProjectModalOpen } from '~/modals/AddNewProjectModal'
 import ConfirmModal from '~/modals/ConfirmModal'
 import { setActions, userStateSchema } from '~/stores'
 import * as devalue from 'devalue'
-import { projectGroupSchema } from '~/types'
+import { exportsSchema } from '~/types'
+import { differenceBy, mergeBy } from '~/utils'
 
 export default function HomePage() {
   const [userState, setUserState] = useUserState()
   const [appState, setAppState] = useAppState()
-
-  const exportsSchema = z.object({
-    projectGroups: projectGroupSchema.array(),
-  })
 
   setActions([
     'spacer',
@@ -30,12 +27,37 @@ export default function HomePage() {
           return
         }
         const { projectGroups } = result.data
-        setUserState('projectGroups', (groups) =>
-          userStateSchema.shape.projectGroups.parse([
-            ...groups,
-            ...projectGroups,
-          ])
-        )
+
+        batch(() => {
+          // merge groups
+          setUserState('projectGroups', (groups) =>
+            mergeBy('id', groups, projectGroups)
+          )
+
+          // merge projects
+          for (const newGroup of projectGroups) {
+            setUserState(
+              'projectGroups',
+              (group) => group.id === newGroup.id,
+              'projects',
+              produce((projects) => {
+                Object.assign(
+                  projects,
+                  mergeBy('id', projects, newGroup.projects)
+                )
+
+                // merge logs
+                for (const project of projects) {
+                  const oldProject = newGroup.projects.find(
+                    ($project) => $project.id === project.id
+                  )
+                  if (!oldProject) continue
+                  project.logs = mergeBy('id', project.logs, oldProject.logs)
+                }
+              })
+            )
+          }
+        })
       },
     },
     {

@@ -60,3 +60,9 @@ export const uniqBy = <T>(arr: T[], key: keyof T): T[] =>
     (value1, index) =>
       index === arr.findIndex((value2) => value2[key] === value1[key])
   )
+
+export const differenceBy = <T>(arr1: T[], arr2: T[], key: keyof T): T[] =>
+  arr1.filter((value1) => !arr2.some((value2) => value1[key] === value2[key]))
+
+export const mergeBy = <T>(key: keyof T, ...arrs: T[][]): T[] =>
+  arrs.reduce((acc, arr) => uniqBy([...acc, ...arr], key), [])

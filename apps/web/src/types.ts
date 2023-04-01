@@ -13,7 +13,10 @@ export const projectSchema = z.discriminatedUnion('paid', [
     id: z.string(),
     name: z.string(),
     description: z.string(),
-    logs: activityLogSchema.array().default([]),
+    logs: activityLogSchema
+      .array()
+      .default([])
+      .transform((logs) => uniqBy(logs, 'id')),
     paid: z.literal(true),
     hourlyRate: z.number(),
     currency: z.string(),
@@ -22,7 +25,10 @@ export const projectSchema = z.discriminatedUnion('paid', [
     id: z.string(),
     name: z.string(),
     description: z.string(),
-    logs: activityLogSchema.array().default([]),
+    logs: activityLogSchema
+      .array()
+      .default([])
+      .transform((logs) => uniqBy(logs, 'id')),
     paid: z.literal(false),
   }),
 ])
@@ -30,7 +36,14 @@ export const projectSchema = z.discriminatedUnion('paid', [
 export const projectGroupSchema = z.object({
   id: z.string(),
   name: z.string(),
-  projects: projectSchema.array().default([]),
+  projects: projectSchema
+    .array()
+    .default([])
+    .transform((projects) => uniqBy(projects, 'id')),
+})
+
+export const exportsSchema = z.object({
+  projectGroups: projectGroupSchema.array(),
 })
 
 declare global {
